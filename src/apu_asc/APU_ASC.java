@@ -27,6 +27,9 @@ public class APU_ASC {
         );
     
     System.out.println("Customer name: " + user1.getName());
+    user1.setName("Aisha Tan");
+    System.out.println("Updated name: "+ user1.getName());
+    
     }
     
 }
