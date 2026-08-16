@@ -3,11 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package apu_asc.model;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
-/**
- *
- * @author User
- */
 public class CounterStaff extends Staff {
     
     public CounterStaff(
@@ -203,6 +201,97 @@ public class CounterStaff extends Staff {
         }
         
         return true;
+    }
+    
+    public Appointment bookAppointmentWithValidation(
+            Appointment[] appointments,
+            String appointmentID,
+            String customerID,
+            String carID,
+            String technicianID,
+            String counterStaffID,
+            String serviceType,
+            String date,
+            String startTime,
+            String endTime,
+            double servicePrice) {
+        
+        boolean validDuration = isValidServiceDuration(
+                serviceType,
+                startTime,
+                endTime);
+        
+        if (!validDuration) {
+            return null;
+        }
+        
+        boolean technicianAvailable = isTechnicianAvailableForAll(
+                appointments,
+                technicianID,
+                date,
+                startTime,
+                endTime);
+        
+        if (!technicianAvailable) {
+            return null;
+        }
+        
+        return bookAppointment(
+                appointmentID,
+                customerID,
+                carID,
+                technicianID,
+                counterStaffID,
+                serviceType,
+                date,
+                startTime,
+                endTime,
+                servicePrice);
+    }
+    
+    public boolean isValidBookingDate(String date) {
+        int year = Integer.parseInt(date.substring(0,4));
+        int month = Integer.parseInt(date.substring(5,7)) -1;
+        int day = Integer.parseInt(date.substring(8, 10));
+        
+        GregorianCalendar bookingDate = new GregorianCalendar(year, month, day);
+        
+        boolean correctDate = bookingDate.get(Calendar.YEAR) == year && bookingDate.get(Calendar.MONTH) == month && bookingDate.get(Calendar.DATE) == day;
+        
+        if (!correctDate) {
+            return false;
+        }
+        
+        GregorianCalendar currentDate = new GregorianCalendar();
+        
+        int currentYear = currentDate.get(Calendar.YEAR);
+        int currentMonth = currentDate.get(Calendar.MONTH);
+        int currentDay = currentDate.get(Calendar.DATE);
+        
+        GregorianCalendar tomorrow = new GregorianCalendar(
+                    currentYear,
+                    currentMonth,
+                    currentDay);
+        
+        tomorrow.add(Calendar.DATE, 1);
+        
+        GregorianCalendar lastBookingDate = new GregorianCalendar(
+                    currentYear,
+                    currentMonth,
+                    currentDay);
+        
+        lastBookingDate.add(Calendar.DATE, 14);
+        
+        boolean beforeTomorrow = tomorrow.after(bookingDate);
+        
+        boolean afterLastBookingDate = bookingDate.after(lastBookingDate);
+        
+        if (beforeTomorrow || afterLastBookingDate) {
+            return false;
+        }
+        
+        return true;
+        
     }
     
 }
