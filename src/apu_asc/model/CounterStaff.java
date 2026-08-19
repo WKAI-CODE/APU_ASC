@@ -216,6 +216,12 @@ public class CounterStaff extends Staff {
             String endTime,
             double servicePrice) {
         
+        boolean withinWorkingHours = isWithinWorkingHours(startTime, endTime);
+        
+        if (!withinWorkingHours) {
+            return null;
+        }
+        
         boolean validDuration = isValidServiceDuration(
                 serviceType,
                 startTime,
@@ -247,6 +253,7 @@ public class CounterStaff extends Staff {
                 startTime,
                 endTime,
                 servicePrice);
+        
     }
     
     public boolean isValidBookingDate(String date) {
@@ -294,4 +301,164 @@ public class CounterStaff extends Staff {
         
     }
     
+    public boolean isWithinWorkingHours(
+            String startTime,
+            String endTime) {
+        
+        int openingTime = convertTimeToMinutes("09:00");
+        int closingTime = convertTimeToMinutes("18:00");
+        int appointmentStart = convertTimeToMinutes(startTime);
+        int appointmentEnd = convertTimeToMinutes(endTime);
+        
+        if (appointmentStart >= openingTime && appointmentEnd <= closingTime && appointmentStart < appointmentEnd){
+            
+            return true;
+            
+        } else {
+            return false;
+        }
+    }
+    
+    public Payment collectPayment(
+            Appointment appointment,
+            String paymentID,
+            String paymentMethod,
+            String paymentDate,
+            String counterStaffID) {
+        
+        boolean completed = appointment.getAppointmentStatus().compareTo("COMPLETED") == 0;
+        boolean unpaid = appointment.getPaymentStatus().compareTo("UNPAID") == 0;
+        
+        if (completed && unpaid) {
+            
+            Payment payment = new Payment(
+                    paymentID,
+                    appointment.getAppointmentID(),
+                    appointment.getServicePrice(),
+                    paymentMethod,
+                    paymentDate,
+                    counterStaffID);
+            
+            appointment.setPaymentStatus("PAID");
+            
+            return payment;
+        }
+        return null;
+    }
+    
+    public Receipt generateReceipt(
+            Payment payment,
+            Appointment appointment,
+            String receiptID,
+            String customerID,
+            String receiptDate) {
+        
+        boolean paymentExists = payment != null;
+        
+        boolean paid = appointment.getPaymentStatus().compareTo("PAID") == 0;
+        
+        if (paymentExists && paid) {
+            
+            Receipt receipt = new Receipt(
+                    receiptID,
+                    payment.getPaymentID(),
+                    appointment.getAppointmentID(),
+                    customerID,
+                    payment.getAmount(),
+                    receiptDate);
+            
+            return receipt;
+        }
+        return null;
+    }
+    
+    public void updateCustomerDetails(
+            Customer customer,
+            String username,
+            String password,
+            String name,
+            String phoneNumber) {
+        
+        customer.setUsername(username);
+        customer.setPassword(password);
+        customer.setName(name);
+        customer.setPhoneNumber(phoneNumber);
+    }
+    
+    public Customer findCustomer(
+            Customer[] customers,
+            String customerID) {
+        
+        for (int i = 0; i < customers.length; i++) {
+        
+            if (customers[i] != null && customers[i].getUserID().compareTo(customerID) == 0) {
+                
+                return customers[i];
+            }
+        }
+        return null;
+    }
+    
+    public boolean deleteCustomer(
+            Customer[] customers,
+            String customerID) {
+        
+        for (int i = 0; i < customers.length; i++) {
+            
+            if (customers[i] != null && customers[i].getUserID().compareTo(customerID) == 0) {
+                
+                customers[i] = null;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Car findCar(
+            Car[] cars,
+            String carID) {
+        
+        for (int i = 0; i < cars.length; i++) {
+            
+            if (cars[i] != null && cars[i].getCarID().compareTo(carID) == 0) {
+                
+                return cars[i];
+            }
+        } 
+        return null;
+    }
+    
+    public boolean deleteCar(
+            Car[] cars,
+            String carID) {
+        
+        for (int i = 0; i < cars.length; i++) {
+            
+            if (cars[i] != null && cars[i].getCarID().compareTo(carID) == 0) {
+                
+                cars[i] = null;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void editProfile(
+            String username,
+            String password,
+            String name,
+            String phoneNumber,
+            int age,
+            String email,
+            String address) {
+        
+        setUsername(username);
+        setPassword(password);
+        setName(name);
+        setPhoneNumber(phoneNumber);
+        setAge(age);
+        setEmail(email);
+        setAddress(address);
+    }
 }
+ 
