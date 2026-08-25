@@ -389,19 +389,16 @@ public class CounterStaff extends Staff {
             String paymentMethod,
             String paymentDate,
             String counterStaffID) {
-        
-        boolean completed = appointment.getAppointmentStatus().compareTo("COMPLETED") == 0;
-        boolean unpaid = appointment.getPaymentStatus().compareTo("UNPAID") == 0;
                     
         if (appointment == null) {
             return null;
         }
         
-        if (appointment.getAppointmentStatus().compareTo("COMPLETED") != 0) {
-            return null;
-        }
+        boolean completed = appointment.getAppointmentStatus().compareTo("COMPLETED") == 0;
         
-        if (appointment.getPaymentStatus().compareTo("UNPAID") != 0) {
+        boolean unpaid = appointment.getPaymentStatus().compareTo("UNPAID") == 0;
+        
+        if (!completed || !unpaid) {
             return null;
         }
         
@@ -409,25 +406,22 @@ public class CounterStaff extends Staff {
                 return null;
         }
         
-        if (completed && unpaid) {
-            
-            Payment payment = new Payment(
-                    paymentID,
-                    appointment.getAppointmentID(),
-                    appointment.getServicePrice(),
-                    paymentMethod,
-                    paymentDate,
-                    counterStaffID);
-            
-            appointment.setPaymentStatus("PAID");
-            updateAppointmentInFile(appointment);
-            savePaymentToFile(payment);
-            
-            return payment;
-        }
 
-        return null;
-    }
+            
+        Payment payment = new Payment(
+                paymentID,
+                appointment.getAppointmentID(),
+                appointment.getServicePrice(),
+                paymentMethod,
+                paymentDate,
+                counterStaffID);
+
+        appointment.setPaymentStatus("PAID");
+        updateAppointmentInFile(appointment);
+        savePaymentToFile(payment);
+
+        return payment;
+        }
     
     public Receipt generateReceipt(
             Payment payment,
@@ -435,38 +429,44 @@ public class CounterStaff extends Staff {
             String receiptID,
             String customerID,
             String receiptDate) {
-        
-        boolean paymentExists = payment != null;
-        
-        boolean paid = appointment.getPaymentStatus().compareTo("PAID") == 0;
-        
+
         if (payment == null || appointment == null) {
             return null;
         }
         
-        if (appointment.getPaymentStatus().compareTo("PAID") != 0){
+        boolean paid = appointment.getPaymentStatus().compareTo("PAID") == 0;
+ 
+        if (!paid) {
+            return null;
+        }
+        
+        boolean correctAppointment = payment.getAppointmentID().compareTo(appointment.getAppointmentID()) == 0;
+        
+        if (!correctAppointment) {
+            return null;
+        }
+        
+        boolean correctCustomer = appointment.getCustomerID().compareTo(customerID) == 0;
+        
+        if (!correctCustomer) {
             return null;
         }
         
         if (FileHandler.recordExists("data/receipts.txt", receiptID)) {
             return null;
         }
-        
-        if (paymentExists && paid) {
             
-            Receipt receipt = new Receipt(
-                    receiptID,
-                    payment.getPaymentID(),
-                    appointment.getAppointmentID(),
-                    customerID,
-                    payment.getAmount(),
-                    receiptDate);
-            
-            saveReceiptToFile(receipt);
-            
-            return receipt;
-        }
-        return null;
+        Receipt receipt = new Receipt(
+                receiptID,
+                payment.getPaymentID(),
+                appointment.getAppointmentID(),
+                customerID,
+                payment.getAmount(),
+                receiptDate);
+
+        saveReceiptToFile(receipt);
+
+        return receipt;
     }
     
     public void updateCustomerDetails(
@@ -645,7 +645,7 @@ public class CounterStaff extends Staff {
         
         Customer owner = findCustomer(customers, customerID);
         
-        boolean ownerExistsInFile = FileHandler.recordExists("data/users.taxt", customerID);
+        boolean ownerExistsInFile = isUserWithRoleInFile(customerID,"CUSTOMER");
         
         if (owner == null && !ownerExistsInFile) {
             return null;
@@ -778,7 +778,7 @@ public class CounterStaff extends Staff {
             
             String[] lines = FileHandler.readFileToArray("data/users.txt");
             
-            Customer[] customers = new Customer[lines.length];
+            Customer[] customers = new Customer[lines.length + 10];
             
             int position = 0;
             
@@ -815,7 +815,7 @@ public class CounterStaff extends Staff {
             
             String[] lines = FileHandler.readFileToArray("data/cars.txt");
             
-            Car[] cars = new Car[lines.length];
+            Car[] cars = new Car[lines.length + 10];
             
             int position = 0;
             
@@ -1015,6 +1015,3 @@ public class CounterStaff extends Staff {
             
             return true;
         }
-        
-        
-}
