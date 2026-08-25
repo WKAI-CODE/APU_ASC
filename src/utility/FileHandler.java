@@ -124,4 +124,88 @@ public class FileHandler {
             );
         }
     }
+    
+    // Check whether an ID already exists
+    public static boolean recordExists(
+            String fileName,
+            String recordID) {
+
+        ArrayList<String> data =
+                readFile(fileName);
+
+        for (int i = 0; i < data.size(); i++) {
+
+            String line = data.get(i);
+
+            if (line.startsWith(recordID + "|")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    // Replace an existing record
+    public static boolean updateRecord(
+            String fileName,
+            String recordID,
+            String newLine) {
+
+        ArrayList<String> data =
+                readFile(fileName);
+
+        for (int i = 0; i < data.size(); i++) {
+
+            String line = data.get(i);
+
+            if (line.startsWith(recordID + "|")) {
+
+                data.set(i, newLine);
+                writeFile(fileName, data);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    // Delete an existing record
+    public static boolean deleteRecord(
+            String fileName,
+            String recordID) {
+
+        ArrayList<String> data =
+                readFile(fileName);
+
+        for (int i = 0; i < data.size(); i++) {
+
+            String line = data.get(i);
+
+            if (line.startsWith(recordID + "|")) {
+
+                data.remove(i);
+                writeFile(fileName, data);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public static String[] readFileToArray(String fileName) {
+        
+        ArrayList<String> data = readFile(fileName);
+        
+        String[] lines = new String[data.size()];
+        
+        for (int i=0; i < data.size(); i++) {
+            lines[i] = data.get(i);
+        }
+        
+        return lines;
+    }
 }

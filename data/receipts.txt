@@ -1,0 +1,3 @@
+receiptID|paymentID|appointmentID|customerID|amount|receiptDate
+R003|P003|A003|C001|50.0|2026-08-25
+R004|P004|A004|C001|50.0|2026-08-25

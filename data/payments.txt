@@ -1,0 +1,3 @@
+paymentID|appointmentID|amount|paymentMethod|paymentDate|counterStaffID
+P003|A003|50.0|CASH|2026-08-25|CS001
+P004|A004|50.0|CASH|2026-08-25|CS001
