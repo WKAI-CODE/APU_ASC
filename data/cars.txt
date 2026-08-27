@@ -1,3 +1,4 @@
 carID|customerID|registrationNumber|brand|model|year|colour
-CAR003|C001|WXY1234|Proton|Saga|2023|Red
+CAR003|C003|WXY1234|Proton|Saga|2023|Red
 CAR001|C001|VAB5678|Toyota|Vios|2022|Black
+CAR002|C001|ABC1234|Honda|City|2021|Blue

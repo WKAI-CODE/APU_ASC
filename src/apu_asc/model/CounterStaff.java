@@ -115,14 +115,13 @@ public class CounterStaff extends Staff {
             String startTime,
             String endTime) {
         
-        int startHour = Integer.parseInt(startTime.substring(0,2));
-        int startMinute = Integer.parseInt(startTime.substring(3,5));
+        int startTotalMinutes = convertTimeToMinutes(startTime);
+        int endTotalMinutes = convertTimeToMinutes(endTime);
         
-        int endHour = Integer.parseInt(endTime.substring(0,2));
-        int endMinute = Integer.parseInt(endTime.substring(3,5));
-        
-        int startTotalMinutes = (startHour * 60) + startMinute;
-        int endTotalMinutes = (endHour * 60) + endMinute;
+        if (serviceType == null || startTotalMinutes == -1 || endTotalMinutes == -1){
+            
+            return false;
+        }
         
         int durationMinutes = endTotalMinutes - startTotalMinutes;
         
@@ -142,10 +141,26 @@ public class CounterStaff extends Staff {
     
     private int convertTimeToMinutes(String time) {
         
-        int hour = Integer.parseInt(time.substring(0, 2));
-        int minute = Integer.parseInt(time.substring(3, 5));
-        
-        return (hour * 60) + minute;
+        try {
+            if (time == null || time.length() != 5 || time.charAt(2) != ':'){
+                
+                return -1;
+            }
+            
+            int hour = Integer.parseInt(time.substring(0, 2));
+            int minute = Integer.parseInt(time.substring(3, 5));
+            
+            if (hour < 0 || hour > 23 || minute < 0 || minute > 59){
+                
+                return -1;
+            }
+            
+            return (hour * 60) + minute;
+            
+        } catch (Exception e) {
+            
+            return -1;
+        }
     }
     
     public boolean isTechnicianAvailable(
@@ -321,48 +336,60 @@ public class CounterStaff extends Staff {
     }
     
     public boolean isValidBookingDate(String date) {
-        int year = Integer.parseInt(date.substring(0,4));
-        int month = Integer.parseInt(date.substring(5,7)) -1;
-        int day = Integer.parseInt(date.substring(8, 10));
         
-        GregorianCalendar bookingDate = new GregorianCalendar(year, month, day);
+        try{
+            if (date == null || date.length() != 10 || date.charAt(4) != '-' || date.charAt(7) != '-'){
+            
+                return false;
+            }
+
+            int year = Integer.parseInt(date.substring(0,4));
+            int month = Integer.parseInt(date.substring(5,7)) -1;
+            int day = Integer.parseInt(date.substring(8, 10));
+
+            GregorianCalendar bookingDate = new GregorianCalendar(year, month, day);
+
+            boolean correctDate = bookingDate.get(Calendar.YEAR) == year && bookingDate.get(Calendar.MONTH) == month && bookingDate.get(Calendar.DATE) == day;
+
+            if (!correctDate) {
+                return false;
+            }
+
+            GregorianCalendar currentDate = new GregorianCalendar();
+
+            int currentYear = currentDate.get(Calendar.YEAR);
+            int currentMonth = currentDate.get(Calendar.MONTH);
+            int currentDay = currentDate.get(Calendar.DATE);
+
+
+
+            GregorianCalendar tomorrow = new GregorianCalendar(
+                        currentYear,
+                        currentMonth,
+                        currentDay);
+
+            tomorrow.add(Calendar.DATE, 1);
+
+            GregorianCalendar lastBookingDate = new GregorianCalendar(
+                        currentYear,
+                        currentMonth,
+                        currentDay);
+
+            lastBookingDate.add(Calendar.DATE, 14);
+
+            boolean beforeTomorrow = tomorrow.after(bookingDate);
+
+            boolean afterLastBookingDate = bookingDate.after(lastBookingDate);
+
+            if (beforeTomorrow || afterLastBookingDate) {
+                return false;
+            }
+
+            return true;
         
-        boolean correctDate = bookingDate.get(Calendar.YEAR) == year && bookingDate.get(Calendar.MONTH) == month && bookingDate.get(Calendar.DATE) == day;
-        
-        if (!correctDate) {
+        } catch (Exception ex) {
             return false;
         }
-        
-        GregorianCalendar currentDate = new GregorianCalendar();
-        
-        int currentYear = currentDate.get(Calendar.YEAR);
-        int currentMonth = currentDate.get(Calendar.MONTH);
-        int currentDay = currentDate.get(Calendar.DATE);
-        
-        GregorianCalendar tomorrow = new GregorianCalendar(
-                    currentYear,
-                    currentMonth,
-                    currentDay);
-        
-        tomorrow.add(Calendar.DATE, 1);
-        
-        GregorianCalendar lastBookingDate = new GregorianCalendar(
-                    currentYear,
-                    currentMonth,
-                    currentDay);
-        
-        lastBookingDate.add(Calendar.DATE, 14);
-        
-        boolean beforeTomorrow = tomorrow.after(bookingDate);
-        
-        boolean afterLastBookingDate = bookingDate.after(lastBookingDate);
-        
-        if (beforeTomorrow || afterLastBookingDate) {
-            return false;
-        }
-        
-        return true;
-        
     }
     
     public boolean isWithinWorkingHours(
@@ -402,11 +429,11 @@ public class CounterStaff extends Staff {
             return null;
         }
         
-        if (FileHandler.recordExists("data/payments.txt",paymentID)) {
-                return null;
+        boolean paymentIDExists = FileHandler.recordExists("data/payments.txt",paymentID);
+                
+        if (paymentIDExists) {
+        return null;
         }
-        
-
             
         Payment payment = new Payment(
                 paymentID,
@@ -452,7 +479,9 @@ public class CounterStaff extends Staff {
             return null;
         }
         
-        if (FileHandler.recordExists("data/receipts.txt", receiptID)) {
+        boolean receiptIDExists = FileHandler.recordExists("data/receipts.txt", receiptID);
+            
+        if (receiptIDExists){
             return null;
         }
             
@@ -504,6 +533,14 @@ public class CounterStaff extends Staff {
             Customer[] customers,
             String customerID) {
         
+        boolean hasCars = customerHasCarsInFile(customerID);
+        
+        if (hasCars) {
+            System.out.println("Customer cannot be deleted because they still own a car.");
+            
+            return false;
+        }
+        
         for (int i = 0; i < customers.length; i++) {
             
             if (customers[i] != null && customers[i].getUserID().compareTo(customerID) == 0) {
@@ -533,6 +570,14 @@ public class CounterStaff extends Staff {
     public boolean deleteCar(
             Car[] cars,
             String carID) {
+        
+        boolean hasAppointments = carHasAppointmentsInFile(carID);
+        
+        if (hasAppointments) {
+            System.out.println("Car cannot be deleted because it has appointment history.");
+            
+            return false;
+        }
         
         for (int i = 0; i < cars.length; i++) {
             
@@ -576,8 +621,7 @@ public class CounterStaff extends Staff {
                 + customer.getPhoneNumber()+"|"
                 + customer.getRole();
         
-        FileHandler.appendFile("data/users.txt", customerData);
-        System.out.println("Saving customer: " + customerData);                              
+        FileHandler.appendFile("data/users.txt", customerData);                            
     }
     
     public Customer addCustomer(
@@ -627,9 +671,7 @@ public class CounterStaff extends Staff {
                 + car.getYear() + "|"
                 + car.getColour();
         
-        FileHandler.appendFile(
-                "data/cars.txt",
-                carData);
+        FileHandler.appendFile("data/cars.txt",carData);
     }
     
     public Car addCar(
@@ -754,265 +796,310 @@ public class CounterStaff extends Staff {
         return FileHandler.updateRecord("data/cars.txt", car.getCarID(), carData);
     }
     
-        public boolean updateAppointmentInFile(
-                Appointment appointment) {
+    public boolean updateAppointmentInFile(
+            Appointment appointment) {
 
-            String appointmentData =
-                    appointment.getAppointmentID() + "|"
-                    + appointment.getCustomerID() + "|"
-                    + appointment.getCarID() + "|"
-                    + appointment.getTechnicianID() + "|"
-                    + appointment.getCounterStaffID() + "|"
-                    + appointment.getServiceType() + "|"
-                    + appointment.getDate() + "|"
-                    + appointment.getStartTime() + "|"
-                    + appointment.getEndTime() + "|"
-                    + appointment.getServicePrice() + "|"
-                    + appointment.getAppointmentStatus() + "|"
-                    + appointment.getPaymentStatus();
+        String appointmentData =
+                appointment.getAppointmentID() + "|"
+                + appointment.getCustomerID() + "|"
+                + appointment.getCarID() + "|"
+                + appointment.getTechnicianID() + "|"
+                + appointment.getCounterStaffID() + "|"
+                + appointment.getServiceType() + "|"
+                + appointment.getDate() + "|"
+                + appointment.getStartTime() + "|"
+                + appointment.getEndTime() + "|"
+                + appointment.getServicePrice() + "|"
+                + appointment.getAppointmentStatus() + "|"
+                + appointment.getPaymentStatus();
 
-            return FileHandler.updateRecord("data/appointments.txt", appointment.getAppointmentID(),appointmentData);
-        }
-        
-        public Customer[] loadCustomersFromFile() {
-            
-            String[] lines = FileHandler.readFileToArray("data/users.txt");
-            
-            Customer[] customers = new Customer[lines.length + 10];
-            
-            int position = 0;
-            
-            for (int i = 1; i < lines.length; i++) {
-                
-                Scanner lineScanner = new Scanner(lines[i]);
-                
-                lineScanner.useDelimiter("\\|");
-                
-                String userID = lineScanner.next();
-                String username = lineScanner.next();
-                String password = lineScanner.next();
-                String name = lineScanner.next();
-                String phoneNumber = lineScanner.next();
-                String role = lineScanner.next();
-                
-                if (role.compareTo("CUSTOMER") == 0) {
-                    
-                    customers[position] =
-                            createCustomer(
-                                    userID,
-                                    username,
-                                    password,
-                                    name,
-                                    phoneNumber);
-                    position++;
-                }
-                lineScanner.close();
-            }
-            return customers;
-        }
-        
-        public Car[] loadCarsFromFile() {
-            
-            String[] lines = FileHandler.readFileToArray("data/cars.txt");
-            
-            Car[] cars = new Car[lines.length + 10];
-            
-            int position = 0;
-            
-            for (int i = 1; i < lines.length; i++) {
-                
-                Scanner lineScanner = new Scanner(lines[i]);
-                lineScanner.useDelimiter("\\|");
-                
-                String carID = lineScanner.next();
-                String customerID = lineScanner.next();
-                String registrationNumber = lineScanner.next();
-                String brand = lineScanner.next();
-                String model = lineScanner.next();
-                
-                int year = Integer.parseInt(lineScanner.next());
-                
-                String colour = lineScanner.next();
-                
-                cars[position] = registerCar(
-                        carID,
-                        customerID,
-                        registrationNumber,
-                        brand,
-                        model,
-                        year,
-                        colour);
-                
+        return FileHandler.updateRecord("data/appointments.txt", appointment.getAppointmentID(),appointmentData);
+    }
+
+    public Customer[] loadCustomersFromFile() {
+
+        String[] lines = FileHandler.readFileToArray("data/users.txt");
+
+        Customer[] customers = new Customer[lines.length + 10];
+
+        int position = 0;
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+
+            lineScanner.useDelimiter("\\|");
+
+            String userID = lineScanner.next();
+            String username = lineScanner.next();
+            String password = lineScanner.next();
+            String name = lineScanner.next();
+            String phoneNumber = lineScanner.next();
+            String role = lineScanner.next();
+
+            if (role.compareTo("CUSTOMER") == 0) {
+
+                customers[position] =
+                        createCustomer(
+                                userID,
+                                username,
+                                password,
+                                name,
+                                phoneNumber);
                 position++;
-                
-                lineScanner.close();
             }
-            return cars;
+            lineScanner.close();
         }
-        
-        public Appointment[] loadAppointmentsFromFile() {
-            
-            String[] lines = FileHandler.readFileToArray("data/appointments.txt");
-            
-            Appointment[] appointments = new Appointment[lines.length + 10];
-            
-            int position = 0;
-            
-            for (int i = 1; i < lines.length; i++) {
-                
-                Scanner lineScanner = new Scanner(lines[i]);
-                lineScanner.useDelimiter("\\|");
-                
-                String appointmentID = lineScanner.next();
-                String customerID = lineScanner.next();
-                String carID = lineScanner.next();
-                String technicianID = lineScanner.next();
-                String counterStaffID = lineScanner.next();
-                String serviceType = lineScanner.next();
-                String date = lineScanner.next();
-                String startTime = lineScanner.next();
-                String endTime = lineScanner.next();
-                double servicePrice = Double.parseDouble(lineScanner.next());
-                String appointmentStatus = lineScanner.next();
-                String paymentStatus = lineScanner.next();
-                
-                appointments[position] = 
-                        new Appointment(
-                                appointmentID,
-                                customerID,
-                                carID,
-                                technicianID,
-                                counterStaffID,
-                                serviceType,
-                                date,
-                                startTime,
-                                endTime,
-                                servicePrice,
-                                appointmentStatus,
-                                paymentStatus);
-                
-                position++;
-                
-                lineScanner.close();
+        return customers;
+    }
+
+    public Car[] loadCarsFromFile() {
+
+        String[] lines = FileHandler.readFileToArray("data/cars.txt");
+
+        Car[] cars = new Car[lines.length + 10];
+
+        int position = 0;
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+            lineScanner.useDelimiter("\\|");
+
+            String carID = lineScanner.next();
+            String customerID = lineScanner.next();
+            String registrationNumber = lineScanner.next();
+            String brand = lineScanner.next();
+            String model = lineScanner.next();
+
+            int year = Integer.parseInt(lineScanner.next());
+
+            String colour = lineScanner.next();
+
+            cars[position] = registerCar(
+                    carID,
+                    customerID,
+                    registrationNumber,
+                    brand,
+                    model,
+                    year,
+                    colour);
+
+            position++;
+
+            lineScanner.close();
+        }
+        return cars;
+    }
+
+    public Appointment[] loadAppointmentsFromFile() {
+
+        String[] lines = FileHandler.readFileToArray("data/appointments.txt");
+
+        Appointment[] appointments = new Appointment[lines.length + 10];
+
+        int position = 0;
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+            lineScanner.useDelimiter("\\|");
+
+            String appointmentID = lineScanner.next();
+            String customerID = lineScanner.next();
+            String carID = lineScanner.next();
+            String technicianID = lineScanner.next();
+            String counterStaffID = lineScanner.next();
+            String serviceType = lineScanner.next();
+            String date = lineScanner.next();
+            String startTime = lineScanner.next();
+            String endTime = lineScanner.next();
+            double servicePrice = Double.parseDouble(lineScanner.next());
+            String appointmentStatus = lineScanner.next();
+            String paymentStatus = lineScanner.next();
+
+            appointments[position] = 
+                    new Appointment(
+                            appointmentID,
+                            customerID,
+                            carID,
+                            technicianID,
+                            counterStaffID,
+                            serviceType,
+                            date,
+                            startTime,
+                            endTime,
+                            servicePrice,
+                            appointmentStatus,
+                            paymentStatus);
+
+            position++;
+
+            lineScanner.close();
+        }
+        return appointments;
+    }
+
+    public double getServicePriceFromFile(
+            String serviceType) {
+
+        String[] lines = FileHandler.readFileToArray("data/service_prices.txt");
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+
+            lineScanner.useDelimiter("\\|");
+
+            String fileServiceType = lineScanner.next();
+            String durationHours = lineScanner.next();
+            double price = Double.parseDouble(lineScanner.next());
+
+            lineScanner.close();
+
+            if (fileServiceType.compareTo(serviceType) == 0) {
+
+                return price;
             }
-            return appointments;
         }
-        
-        public double getServicePriceFromFile(
-                String serviceType) {
-            
-            String[] lines = FileHandler.readFileToArray("data/service_prices.txt");
-            
-            for (int i = 1; i < lines.length; i++) {
-                
-                Scanner lineScanner = new Scanner(lines[i]);
-                
-                lineScanner.useDelimiter("\\|");
-                
-                String fileServiceType = lineScanner.next();
-                String durationHours = lineScanner.next();
-                double price = Double.parseDouble(lineScanner.next());
-                
-                lineScanner.close();
-                
-                if (fileServiceType.compareTo(serviceType) == 0) {
-                    
-                    return price;
-                }
+
+        return -1;
+    }
+
+    public boolean isUserWithRoleInFile(
+            String userID,
+            String requiredRole) {
+
+        String[] lines = FileHandler.readFileToArray("data/users.txt");
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+
+            lineScanner.useDelimiter("\\|");
+
+            String fileUserID = lineScanner.next();
+            String username = lineScanner.next();
+            String password = lineScanner.next();
+            String name = lineScanner.next();
+            String phoneNumber = lineScanner.next();
+            String role = lineScanner.next();
+
+            lineScanner.close();
+
+            if (fileUserID.compareTo(userID) == 0 && role.compareTo(requiredRole) == 0){
+
+                return true;
             }
-            
-            return -1;
         }
-        
-        public boolean isUserWithRoleInFile(
-                String userID,
-                String requiredRole) {
-            
-            String[] lines = FileHandler.readFileToArray("data/users.txt");
-            
-            for (int i = 1; i < lines.length; i++) {
-                
-                Scanner lineScanner = new Scanner(lines[i]);
-                
-                lineScanner.useDelimiter("\\|");
-                
-                String fileUserID = lineScanner.next();
-                String username = lineScanner.next();
-                String password = lineScanner.next();
-                String name = lineScanner.next();
-                String phoneNumber = lineScanner.next();
-                String role = lineScanner.next();
-                
-                lineScanner.close();
-                
-                if (fileUserID.compareTo(userID) == 0 && role.compareTo(requiredRole) == 0){
-                    
-                    return true;
-                }
+        return false;
+    }
+
+    public boolean customerHasCarsInFile(String customerID) {
+
+        String[] lines = FileHandler.readFileToArray("data/cars.txt");
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+
+            lineScanner.useDelimiter("\\|");
+
+            lineScanner.next(); // Skip CarID
+            String fileCustomerID = lineScanner.next();
+
+            lineScanner.close();
+
+            if (fileCustomerID.compareTo(customerID) == 0) {
+                return true;
             }
-            return false;
         }
-        
-        public boolean isCarOwnedByCustomerInFile(
-                String carID,
-                String customerID) {
-            
-            String[] lines = FileHandler.readFileToArray("data/cars.txt");
-            
-            for (int i = 1; i < lines.length; i++) {
-                
-                Scanner lineScanner = new Scanner(lines[i]);
-                
-                lineScanner.useDelimiter("\\|");
-                
-                String fileCarID = lineScanner.next();
-                String fileCustomerID = lineScanner.next();
-                
-                lineScanner.close();
-                
-                if (fileCarID.compareTo(carID) == 0 && fileCustomerID.compareTo(customerID) == 0) {
-                    return true;
-                }
+        return false;
+    }
+
+    public boolean carHasAppointmentsInFile(String carID){
+
+        String[] lines = FileHandler.readFileToArray("data/appointments.txt");
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+            lineScanner.useDelimiter("\\|");
+
+            lineScanner.next(); //Skip appointmentID
+            lineScanner.next(); //Skip customerID
+
+            String fileCarID = lineScanner.next();
+
+            lineScanner.close();
+
+            if (fileCarID.compareTo(carID) == 0) {
+                return true;
             }
-            return false;
         }
-        
-        public boolean updateCounterStaffUserFile() {
-            
-            String userData =
-                    getUserID() + "|" +
-                    getUsername() + "|" +
-                    getPassword() + "|" +
-                    getName() + "|" +
-                    getPhoneNumber() + "|" +
-                    getRole();
-            
-            if (FileHandler.recordExists("data/users.txt",getUserID())) {
-                
-                return FileHandler.updateRecord("data/users.txt", getUserID(), userData);
+        return false;
+    }
+
+    public boolean isCarOwnedByCustomerInFile(
+            String carID,
+            String customerID) {
+
+        String[] lines = FileHandler.readFileToArray("data/cars.txt");
+
+        for (int i = 1; i < lines.length; i++) {
+
+            Scanner lineScanner = new Scanner(lines[i]);
+
+            lineScanner.useDelimiter("\\|");
+
+            String fileCarID = lineScanner.next();
+            String fileCustomerID = lineScanner.next();
+
+            lineScanner.close();
+
+            if (fileCarID.compareTo(carID) == 0 && fileCustomerID.compareTo(customerID) == 0) {
+                return true;
             }
-            
-            FileHandler.appendFile("data/users.txt", userData);
-            
-            return true;
         }
-        
-        public boolean updateCounterStaffDetailsFile() {
-            
-            String staffData =
-                    getUserID() + "|" +
-                    getAge() + "|" +
-                    getIdentityNumber() + "|" +
-                    getEmail() + "|" +
-                    getAddress();
-            
-            if (FileHandler.recordExists("data/staff.txt",getUserID())) {
-                
-                return FileHandler.updateRecord("data/staff.txt", getUserID(),staffData);    
-            }
-            
-            FileHandler.appendFile("data/staff.txt", staffData);
-            
-            return true;
+        return false;
+    }
+
+    public boolean updateCounterStaffUserFile() {
+
+        String userData =
+                getUserID() + "|" +
+                getUsername() + "|" +
+                getPassword() + "|" +
+                getName() + "|" +
+                getPhoneNumber() + "|" +
+                getRole();
+
+        if (FileHandler.recordExists("data/users.txt",getUserID())) {
+
+            return FileHandler.updateRecord("data/users.txt", getUserID(), userData);
         }
+
+        FileHandler.appendFile("data/users.txt", userData);
+
+        return true;
+    }
+
+    public boolean updateCounterStaffDetailsFile() {
+
+        String staffData =
+                getUserID() + "|" +
+                getAge() + "|" +
+                getIdentityNumber() + "|" +
+                getEmail() + "|" +
+                getAddress();
+
+        if (FileHandler.recordExists("data/staff.txt",getUserID())) {
+
+            return FileHandler.updateRecord("data/staff.txt", getUserID(),staffData);    
+        }
+
+        FileHandler.appendFile("data/staff.txt", staffData);
+
+        return true;
+    }
 }
