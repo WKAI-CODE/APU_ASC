@@ -9,7 +9,7 @@ import apu_asc.model.Car;
 import apu_asc.model.CounterStaff;
 import apu_asc.model.Customer;
 
-public class APU_ASC {
+public class ASCApp {
 
     public static void main(String[] args) {
 
