@@ -1,0 +1,3 @@
+appointmentID|customerID|carID|technicianID|counterStaffID|serviceType|date|startTime|endTime|servicePrice|appointmentStatus|paymentStatus
+A003|C001|CAR001|T001|CS001|MINOR|2026-08-25|10:00|11:00|50.0|BOOKED|UNPAID
+A004|C003|CAR003|T001|CS001|MINOR|2026-08-25|10:00|11:00|50.0|COMPLETED|PAID

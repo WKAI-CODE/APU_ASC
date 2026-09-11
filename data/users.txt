@@ -1,0 +1,5 @@
+userID|username|password|name|phoneNumber|role
+C003|john|john123|John Lee|0133333333|CUSTOMER
+C001|aisha_new|new123|Aisha Tan|0123456789|CUSTOMER
+T001|tech01|pass123|Technician Name|0123456789|TECHNICIAN
+C5001|counter_new|newPassword123|Ali Ahmad|0122222222|COUNTER_STAFF

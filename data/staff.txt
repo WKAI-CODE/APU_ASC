@@ -1,0 +1,2 @@
+userID|age|identityNumber|email|address
+C5001|25|IC001|ali@apu.edu.my|Kuala Lumpur
