@@ -1,5 +1,6 @@
-userID|age|identityNumber|email|address
-M001|20|071201102345|elvis@1234|No15,Jalan Gembira
-C001|19|10203910312|kzlim1234@gmail.com|10,jalan hi
-
-M002|12|12|a|v
+userID|0|||
+M001|0|||
+C001|0|||
+M002|0|||
+T002|18|071117-10-2123|as@gmail.com|no1
+T001|19|071117-10-1234|as@gmail.com|no12

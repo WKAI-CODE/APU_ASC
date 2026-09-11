@@ -5,1046 +5,440 @@ import apu_asc.model.Staff;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class ManagerGUI extends JFrame {
+public class ManagerGUI extends JFrame implements ActionListener {
 
-    private final ManagerFunction managerFunction;
-
-    private String userID;
-    private String username;
-    private String name;
-
-    public ManagerGUI(String userID, String username, String name) {
-
-        this.userID = userID;
-        this.username = username;
-        this.name = name;
-
+    private ManagerFunction managerFunction;
+    private Staff staff;
+    
+    private JPanel mainPanel;
+    private JPanel contentPanel;
+    
+    private JButton addStaffButton;
+    private JButton viewStaffButton;
+    private JButton updateStaffButton;
+    private JButton deleteStaffButton;
+    private JButton servicePriceButton;
+    private JButton feedbackButton;
+    private JButton commentsButton;
+    private JButton reportsButton;
+    private JButton passwordButton;
+    private JButton logoutButton;
+    
+    public ManagerGUI(Staff staff){
+        
+        this.staff = staff;
         managerFunction = new ManagerFunction();
-
-        setTitle("APU Automotive Service Centre - Manager");
-        setSize(700, 500);
-        setLocationRelativeTo(null);
+        
+        setTitle("Automotive Service Centre - Manager");
+        setSize(1000,650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        
+        
+        //main panel
+        mainPanel = new JPanel(new BorderLayout());
+        
+        
+        //TOP PANEL
+        JPanel topPanel = new JPanel();
+        
+        topPanel.setLayout(new BoxLayout(topPanel,BoxLayout.Y_AXIS));
+        
+        JLabel titleLabel = new JLabel("AUTOMOTIVE SERVICE CENTRE");
+        
+        titleLabel.setFont(new Font("Arial", Font.BOLD,24));
+        
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JLabel welcomeLabel = new JLabel(
+                            "Welcome, " 
+                            + staff.getName()
+                            + " (Manager)");
+        
+        welcomeLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        topPanel.add(Box.createVerticalStrut(15));
+        
+        topPanel.add(titleLabel);
+        
+        topPanel.add(Box.createVerticalStrut(5));
+        
+        topPanel.add(welcomeLabel);
+        
+        topPanel.add(Box.createVerticalStrut(15));
+        
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        
+        
+        //LEFT MENU
+        JPanel menuPanel = new JPanel();
+        
+        menuPanel.setLayout(new GridLayout(10,1,5,5));
+        
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        
+        addStaffButton = new JButton("Add Staff");
+        
+        viewStaffButton = new JButton("View Staff");
 
-        createGUI();
+        updateStaffButton = new JButton("Update Staff");
 
+        deleteStaffButton = new JButton("Delete Staff");
+
+        servicePriceButton = new JButton("Set Service Price");
+
+        feedbackButton = new JButton("View Technician Feedback");
+
+        commentsButton = new JButton("View Customer Comments");
+
+        reportsButton = new JButton("Generate Reports");
+
+        passwordButton = new JButton("Change Password");
+
+        logoutButton = new JButton("Logout");
+
+        menuPanel.add(addStaffButton);
+        menuPanel.add(viewStaffButton);
+        menuPanel.add(updateStaffButton);
+        menuPanel.add(deleteStaffButton);
+        menuPanel.add(servicePriceButton);
+        menuPanel.add(feedbackButton);
+        menuPanel.add(commentsButton);
+        menuPanel.add(reportsButton);
+        menuPanel.add(passwordButton);
+        menuPanel.add(logoutButton);
+
+        addStaffButton.addActionListener(this);
+        viewStaffButton.addActionListener(this);
+        updateStaffButton.addActionListener(this);
+        deleteStaffButton.addActionListener(this);
+        servicePriceButton.addActionListener(this);
+        feedbackButton.addActionListener(this);
+        commentsButton.addActionListener(this);
+        reportsButton.addActionListener(this);
+        passwordButton.addActionListener(this);
+        logoutButton.addActionListener(this);
+        
+        mainPanel.add(menuPanel, BorderLayout.WEST);
+        
+        
+        //CENTER CONTENT
+        contentPanel = new JPanel(new BorderLayout());
+        
+        JLabel dashboardLabel = new JLabel("Manager Dashboard");
+        
+        dashboardLabel.setFont(new Font("Arial", Font.BOLD , 22));
+        
+        dashboardLabel.setHorizontalAlignment(JLabel.CENTER);
+        
+        JTextArea welcomeText = new JTextArea();
+        
+        welcomeText.setText(
+                "\nWelcome to the Manager Dashboard.\n\n"
+                + "Please select an option from the menu."
+        );
+        
+        welcomeText.setFont(new Font("Arial", Font.PLAIN, 16));
+        
+        welcomeText.setEditable(false);
+        
+        welcomeText.setBackground(contentPanel.getBackground());
+        
+        contentPanel.add(dashboardLabel, BorderLayout.NORTH);
+        
+        contentPanel.add(welcomeText , BorderLayout.CENTER);
+        
+        mainPanel.add(contentPanel , BorderLayout.CENTER);
+        
+        add(mainPanel);
+        
         setVisible(true);
     }
+        
+        
+        //BUTTON ACTION
+        public void actionPerformed(ActionEvent e){
+            if (e.getSource() == addStaffButton) {
 
-    // ============================================================
-    // MAIN GUI
-    // ============================================================
+            addStaff();
 
-    private void createGUI() {
+        } else if (e.getSource() == viewStaffButton) {
 
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        );
+            viewStaff();
 
-        JLabel title = new JLabel(
-                "APU AUTOMOTIVE SERVICE CENTRE - MANAGER",
-                SwingConstants.CENTER
-        );
+        } else if (e.getSource() == updateStaffButton) {
 
-        title.setFont(new Font("Arial", Font.BOLD, 20));
+            updateStaff();
 
-        JLabel welcome = new JLabel(
-                "Welcome, " + name + " (" + username + ")",
-                SwingConstants.CENTER
-        );
+        } else if (e.getSource() == deleteStaffButton) {
 
-        welcome.setFont(new Font("Arial", Font.PLAIN, 14));
+            deleteStaff();
 
-        JPanel topPanel = new JPanel(new GridLayout(2, 1));
-        topPanel.add(title);
-        topPanel.add(welcome);
+        } else if (e.getSource() == servicePriceButton) {
 
-        mainPanel.add(topPanel, BorderLayout.NORTH);
+            setServicePrice();
 
-        JPanel buttonPanel =
-                new JPanel(new GridLayout(4, 2, 10, 10));
+        } else if (e.getSource() == feedbackButton) {
 
-        JButton addStaffButton =
-                new JButton("Add Staff");
+            viewFeedback();
 
-        JButton viewStaffButton =
-                new JButton("View Staff");
+        } else if (e.getSource() == commentsButton) {
 
-        JButton updateStaffButton =
-                new JButton("Update Staff");
+            viewComments();
 
-        JButton deleteStaffButton =
-                new JButton("Delete Staff");
+        } else if (e.getSource() == reportsButton) {
 
-        JButton servicePriceButton =
-                new JButton("Set Service Price");
+            generateReports();
 
-        JButton feedbackButton =
-                new JButton("View Feedback");
+        } else if (e.getSource() == passwordButton) {
 
-        JButton reportButton =
-                new JButton("Generate Reports");
+            changePassword();
 
-        JButton passwordButton =
-                new JButton("Change Password");
+        } else if (e.getSource() == logoutButton) {
 
-        buttonPanel.add(addStaffButton);
-        buttonPanel.add(viewStaffButton);
-
-        buttonPanel.add(updateStaffButton);
-        buttonPanel.add(deleteStaffButton);
-
-        buttonPanel.add(servicePriceButton);
-        buttonPanel.add(feedbackButton);
-
-        buttonPanel.add(reportButton);
-        buttonPanel.add(passwordButton);
-
-        mainPanel.add(buttonPanel, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel();
-
-        JButton logoutButton =
-                new JButton("Logout");
-
-        JButton exitButton =
-                new JButton("Exit");
-
-        bottomPanel.add(logoutButton);
-        bottomPanel.add(exitButton);
-
-        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        add(mainPanel);
-
-        // BUTTON ACTIONS
-
-        addStaffButton.addActionListener(e -> addStaff());
-
-        viewStaffButton.addActionListener(e -> viewStaff());
-
-        updateStaffButton.addActionListener(e -> updateStaff());
-
-        deleteStaffButton.addActionListener(e -> deleteStaff());
-
-        servicePriceButton.addActionListener(e -> setServicePrice());
-
-        feedbackButton.addActionListener(e -> viewFeedback());
-
-        reportButton.addActionListener(e -> generateReports());
-
-        passwordButton.addActionListener(e -> changePassword());
-
-        logoutButton.addActionListener(e -> logout());
-
-        exitButton.addActionListener(e -> System.exit(0));
+            logout();
+        }
     }
+        
+        //ADD STAFF
+        private void addStaff(){
+            
+            while(true){
+                String[] roles = {
+                    "Manager",
+                    "CounterStaff",
+                    "Technician"
+                
+                };
+                
+                String role = 
+                            (String) JOptionPane.showInputDialog(
+                            this,
+                            "Select Staff Role:",
+                            "Add Staff",
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            roles,
+                            roles[0]);
+                
+                if (role == null){
+                    return;
+                }
+                
+                String name = JOptionPane.showInputDialog(this,"Enter Name:");
+                
+                if(name == null){
+                    return;
+                }
+                
+                String username =
+                    JOptionPane.showInputDialog(
+                            this,
+                            "Enter Username:");
 
-    // ============================================================
-    // 1. ADD STAFF
-    // ============================================================
+                if (username == null) {
+                    return;
+                }
+                
+                String phoneNumber = JOptionPane.showInputDialog(this, "Enter Phone Number:");
+                
+                if(phoneNumber == null){
+                    return;              
+                }
+                
+                String ageText =
+                    JOptionPane.showInputDialog(
+                            this,
+                            "Enter Age:");
 
-    private void addStaff() {
+            if (ageText == null) {
+                return;
+            }
 
-        // User ID is NOT entered manually anymore
-        // It will be generated automatically.
+            String identityNumber =
+                    JOptionPane.showInputDialog(
+                            this,
+                            "Enter Identity Number:");
 
-        JPanel panel = new JPanel(
-                new GridLayout(8, 2, 5, 5)
-        );
+            if (identityNumber == null) {
+                return;
+            }
 
-        JComboBox<String> roleBox =
-                new JComboBox<>(
-                        new String[]{
-                            "Manager",
-                            "CounterStaff",
-                            "Technician"
-                        }
-                );
+            String email =
+                    JOptionPane.showInputDialog(
+                            this,
+                            "Enter Email:");
 
-        JTextField usernameField =
-                new JTextField();
+            if (email == null) {
+                return;
+            }
 
-        JTextField nameField =
-                new JTextField();
+            String address =
+                    JOptionPane.showInputDialog(
+                            this,
+                            "Enter Address:");
 
-        JTextField phoneField =
-                new JTextField();
+            if (address == null) {
+                return;
+            }
+            
+            
+            //EMPTY FIELD VALIDATION
+            if (name.trim().isEmpty()
+                    || username.trim().isEmpty()
+                    || phoneNumber.trim().isEmpty()
+                    || ageText.trim().isEmpty()
+                    || identityNumber.trim().isEmpty()
+                    || email.trim().isEmpty()
+                    || address.trim().isEmpty()) {
 
-        JTextField ageField =
-                new JTextField();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "All fields are required.",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
 
-        JTextField identityField =
-                new JTextField();
+                continue;
+            }
+            
+            
+            //PHONE VALIATION
+            if (!phoneNumber.matches(
+                    "^(01)[0-9]{8,9}$")) {
 
-        JTextField emailField =
-                new JTextField();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid phone number.\n"
+                        + "Example: 0123456789",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
 
-        JTextField addressField =
-                new JTextField();
+                continue;
+            }
+            
+            //IDENTITY NUMBER VALIDATION
+            if (!identityNumber.matches(
+                    "^[0-9]{6}-[0-9]{2}-[0-9]{4}$")) {
 
-        panel.add(new JLabel("Role:"));
-        panel.add(roleBox);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid identity number.\n"
+                        + "Example: 010101-01-1234",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
 
-        panel.add(new JLabel("Username:"));
-        panel.add(usernameField);
+                continue;
+            }
+            
+            //EMAIL VALIDATION
+            if (!email.matches(
+                    "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
 
-        panel.add(new JLabel("Name:"));
-        panel.add(nameField);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid email format.",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
 
-        panel.add(new JLabel("Phone Number:"));
-        panel.add(phoneField);
+                continue;
+            }
 
-        panel.add(new JLabel("Age:"));
-        panel.add(ageField);
+            int age;
 
-        panel.add(new JLabel("Identity Number:"));
-        panel.add(identityField);
+            try {
 
-        panel.add(new JLabel("Email:"));
-        panel.add(emailField);
+                age = Integer.parseInt(
+                        ageText.trim());
 
-        panel.add(new JLabel("Address:"));
-        panel.add(addressField);
+            } catch (NumberFormatException ex) {
 
-        int result = JOptionPane.showConfirmDialog(
-                this,
-                panel,
-                "Add Staff",
-                JOptionPane.OK_CANCEL_OPTION
-        );
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Age must be a number.",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
 
-        if (result != JOptionPane.OK_OPTION) {
-            return;
-        }
+                continue;
+            }
+            
+            
+            //AGE VALIDATION
+            if (age < 18 || age > 65) {
 
-        // ========================================================
-        // GET VALUES
-        // ========================================================
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Age must be between 18 and 65.",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
 
-        String role =
-                roleBox.getSelectedItem().toString();
+                continue;
+            }
+            
+            //USERNAME VALIDATION
+            if (managerFunction.findUsername(
+                    username.trim()) != null) {
 
-        String username =
-                usernameField.getText().trim();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Username already exists.",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE);
 
-        String staffName =
-                nameField.getText().trim();
-
-        String phone =
-                phoneField.getText().trim();
-
-        String ageText =
-                ageField.getText().trim();
-
-        String identity =
-                identityField.getText().trim();
-
-        String email =
-                emailField.getText().trim();
-
-        String address =
-                addressField.getText().trim();
-
-        // ========================================================
-        // CHECK EMPTY
-        // ========================================================
-
-        if (username.isEmpty()
-                || staffName.isEmpty()
-                || phone.isEmpty()
-                || ageText.isEmpty()
-                || identity.isEmpty()
-                || email.isEmpty()
-                || address.isEmpty()) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Please fill in all fields.",
-                    "Invalid Input",
-                    JOptionPane.WARNING_MESSAGE
+                continue;
+            }
+            
+            
+            //GENERATE USER ID
+            String userID = managerFunction.generateUserID(role);
+            
+            Staff newStaff = managerFunction.addStaff(
+                            role,
+                            userID,
+                            username.trim(),
+                            name.trim(),
+                            phoneNumber.trim(),
+                            age,
+                            identityNumber.trim(),
+                            email.trim(),
+                            address.trim()
             );
-
-            return;
-        }
-
-        // ========================================================
-        // CHECK AGE
-        // ========================================================
-
-        int age;
-
-        try {
-
-            age = Integer.parseInt(ageText);
-
-        } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Age must be a number.",
-                    "Invalid Age",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        if (age <= 0) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Age must be greater than 0.",
-                    "Invalid Age",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        // ========================================================
-        // CHECK DUPLICATE USERNAME
-        // ========================================================
-
-        if (managerFunction.usernameExists(username)) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Username already exists!\n"
-                    + "Please use another username.",
-                    "Duplicate Username",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        // ========================================================
-        // AUTO GENERATE USER ID
-        // ========================================================
-
-        String userID =
-                managerFunction.generateUserID(role);
-
-        if (userID.isEmpty()) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid staff role.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        // ========================================================
-        // ADD STAFF
-        // ========================================================
-
-        boolean success =
-                managerFunction.addStaff(
-                        role,
-                        userID,
-                        username,
-                        staffName,
-                        phone,
-                        age,
-                        identity,
-                        email,
-                        address
-                );
-
-        // ========================================================
-        // RESULT
-        // ========================================================
-
-        if (success) {
-
+            
+            if (newStaff == null){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Failed to add staff.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                
+                continue;
+            }
+            
             JOptionPane.showMessageDialog(
                     this,
                     "Staff added successfully!\n\n"
-                    + "User ID: " + userID + "\n"
-                    + "Username: " + username + "\n"
-                    + "Role: " + role + "\n\n"
-                    + "Default Password:\n"
-                    + username + userID,
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
+                    +"User ID: "
+                    + newStaff.getUserID()
+                    + "\nUsername: "
+                    + newStaff.getUsername()
+                    + "\nDefault Password: "
+                    + newStaff.getPassword()
             );
-
-        } else {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to add staff.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-    // ============================================================
-    // 2. VIEW STAFF
-    // ============================================================
-
-    private void viewStaff() {
-
-        ArrayList<Staff> staffList =
-                managerFunction.getAllStaff();
-
-        if (staffList.isEmpty()) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No staff found.",
-                    "View Staff",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            return;
-        }
-
-        StringBuilder output =
-                new StringBuilder();
-
-        output.append(
-                "================ STAFF LIST ================\n\n"
-        );
-
-        for (Staff staff : staffList) {
-
-            output.append(
-                    "--------------------------------------------\n"
-            );
-
-            output.append("User ID          : ")
-                    .append(staff.getUserID())
-                    .append("\n");
-
-            output.append("Username         : ")
-                    .append(staff.getUsername())
-                    .append("\n");
-
-            output.append("Name             : ")
-                    .append(staff.getName())
-                    .append("\n");
-
-            output.append("Role             : ")
-                    .append(staff.getRole())
-                    .append("\n");
-
-            output.append("Phone Number     : ")
-                    .append(staff.getPhoneNumber())
-                    .append("\n");
-
-            output.append("Age              : ")
-                    .append(staff.getAge())
-                    .append("\n");
-
-            output.append("Identity Number  : ")
-                    .append(staff.getIdentityNumber())
-                    .append("\n");
-
-            output.append("Email            : ")
-                    .append(staff.getEmail())
-                    .append("\n");
-
-            output.append("Address          : ")
-                    .append(staff.getAddress())
-                    .append("\n\n");
-        }
-
-        JTextArea textArea =
-                new JTextArea(output.toString());
-
-        textArea.setEditable(false);
-
-        textArea.setFont(
-                new Font("Monospaced", Font.PLAIN, 13)
-        );
-
-        JScrollPane scrollPane =
-                new JScrollPane(textArea);
-
-        scrollPane.setPreferredSize(
-                new Dimension(650, 400)
-        );
-
-        JOptionPane.showMessageDialog(
-                this,
-                scrollPane,
-                "View Staff",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-    // ============================================================
-    // 3. UPDATE STAFF
-    // ============================================================
-
-    private void updateStaff() {
-
-        String userID =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter User ID to update:"
-                );
-
-        if (userID == null
-                || userID.trim().isEmpty()) {
-
-            return;
-        }
-
-        userID =
-                userID.trim().toUpperCase();
-
-        String[] fields = {
-            "Username",
-            "Name",
-            "Phone Number",
-            "Age",
-            "Identity Number",
-            "Email",
-            "Address"
-        };
-
-        String field =
-                (String) JOptionPane.showInputDialog(
-                        this,
-                        "Select information to update:",
-                        "Update Staff",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        fields,
-                        fields[0]
-                );
-
-        if (field == null) {
-            return;
-        }
-
-        String newValue =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter new " + field + ":"
-                );
-
-        if (newValue == null
-                || newValue.trim().isEmpty()) {
-
-            return;
-        }
-
-        newValue =
-                newValue.trim();
-
-        // Username cannot duplicate
-
-        if (field.equals("Username")
-                && managerFunction.usernameExists(newValue)) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Username already exists!",
-                    "Duplicate Username",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        boolean success =
-                managerFunction.updateStaff(
-                        userID,
-                        field,
-                        newValue
-                );
-
-        if (success) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    field + " updated successfully!"
-            );
-
-        } else {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Update failed.\n"
-                    + "Please check the User ID and input.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-    // ============================================================
-    // 4. DELETE STAFF
-    // ============================================================
-
-    private void deleteStaff() {
-
-        String userID =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter User ID to delete:"
-                );
-
-        if (userID == null
-                || userID.trim().isEmpty()) {
-
-            return;
-        }
-
-        userID =
-                userID.trim().toUpperCase();
-
-        int confirm =
-                JOptionPane.showConfirmDialog(
-                        this,
-                        "Are you sure you want to delete staff:\n"
-                        + userID + "?",
-                        "Confirm Delete",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE
-                );
-
-        if (confirm != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        boolean success =
-                managerFunction.deleteStaff(userID);
-
-        if (success) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Staff deleted successfully!"
-            );
-
-        } else {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Staff not found.",
-                    "Delete Failed",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-    // ============================================================
-    // 5. SET SERVICE PRICE
-    // ============================================================
-
-    private void setServicePrice() {
-
-        String minorText =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter MINOR service price:"
-                );
-
-        if (minorText == null) {
-            return;
-        }
-
-        String majorText =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter MAJOR service price:"
-                );
-
-        if (majorText == null) {
-            return;
-        }
-
-        double minorPrice;
-        double majorPrice;
-
-        try {
-
-            minorPrice =
-                    Double.parseDouble(minorText);
-
-            majorPrice =
-                    Double.parseDouble(majorText);
-
-        } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Price must be a valid number.",
-                    "Invalid Price",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        if (minorPrice < 0
-                || majorPrice < 0) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Price cannot be negative.",
-                    "Invalid Price",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        boolean success =
-                managerFunction.setServicePrice(
-                        minorPrice,
-                        majorPrice
-                );
-
-        if (success) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Service prices updated successfully!\n\n"
-                    + "MINOR : RM "
-                    + String.format("%.2f", minorPrice)
-                    + "\n"
-                    + "MAJOR : RM "
-                    + String.format("%.2f", majorPrice)
-            );
-
-        } else {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Failed to update service prices."
-            );
-        }
-    }
-
-    // ============================================================
-    // 6. VIEW FEEDBACK
-    // ============================================================
-
-    private void viewFeedback() {
-
-        ArrayList<String> technicianFeedback =
-                managerFunction.getTechnicianFeedback();
-
-        ArrayList<String> customerComments =
-                managerFunction.getCustomerComments();
-
-        StringBuilder output =
-                new StringBuilder();
-
-        output.append(
-                "========== TECHNICIAN FEEDBACK ==========\n\n"
-        );
-
-        if (technicianFeedback.isEmpty()) {
-
-            output.append(
-                    "No technician feedback found.\n"
-            );
-
-        } else {
-
-            for (String line : technicianFeedback) {
-
-                output.append(line)
-                        .append("\n");
+            
+            break;
             }
+        
+        }
+        
+        
+        //VIEW STAFF
+            
         }
 
-        output.append(
-                "\n========== CUSTOMER COMMENTS ==========\n\n"
-        );
-
-        if (customerComments.isEmpty()) {
-
-            output.append(
-                    "No customer comments found.\n"
-            );
-
-        } else {
-
-            for (String line : customerComments) {
-
-                output.append(line)
-                        .append("\n");
-            }
-        }
-
-        JTextArea textArea =
-                new JTextArea(output.toString());
-
-        textArea.setEditable(false);
-
-        textArea.setFont(
-                new Font("Monospaced", Font.PLAIN, 13)
-        );
-
-        JScrollPane scrollPane =
-                new JScrollPane(textArea);
-
-        scrollPane.setPreferredSize(
-                new Dimension(650, 400)
-        );
-
-        JOptionPane.showMessageDialog(
-                this,
-                scrollPane,
-                "Feedback and Comments",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-    // ============================================================
-    // 7. GENERATE REPORTS
-    // ============================================================
-
-    private void generateReports() {
-
-        String[] reports = {
-            "Appointment Status Report",
-            "Service Analysis Report",
-            "Revenue Report",
-            "Technician Performance Report",
-            "Exit"
-        };
-
-        while (true) {
-
-            String choice =
-                    (String) JOptionPane.showInputDialog(
-                            this,
-                            "Select a report:",
-                            "Generate Reports",
-                            JOptionPane.QUESTION_MESSAGE,
-                            null,
-                            reports,
-                            reports[0]
-                    );
-
-            if (choice == null
-                    || choice.equals("Exit")) {
-
-                break;
-            }
-
-            String report = "";
-
-            switch (choice) {
-
-                case "Appointment Status Report":
-
-                    report =
-                            managerFunction
-                                    .appointmentStatusReport();
-
-                    break;
-
-                case "Service Analysis Report":
-
-                    report =
-                            managerFunction
-                                    .serviceAnalysisReport();
-
-                    break;
-
-                case "Revenue Report":
-
-                    report =
-                            managerFunction
-                                    .revenueReport();
-
-                    break;
-
-                case "Technician Performance Report":
-
-                    report =
-                            managerFunction
-                                    .technicianPerformanceReport();
-
-                    break;
-            }
-
-            JTextArea textArea =
-                    new JTextArea(report);
-
-            textArea.setEditable(false);
-
-            textArea.setFont(
-                    new Font("Monospaced", Font.PLAIN, 13)
-            );
-
-            JScrollPane scrollPane =
-                    new JScrollPane(textArea);
-
-            scrollPane.setPreferredSize(
-                    new Dimension(600, 400)
-            );
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    scrollPane,
-                    choice,
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-        }
-    }
-
-    // ============================================================
-    // 8. CHANGE OWN PASSWORD
-    // ============================================================
-
-    private void changePassword() {
-
-        JPasswordField currentPassword =
-                new JPasswordField();
-
-        JPasswordField newPassword =
-                new JPasswordField();
-
-        JPasswordField confirmPassword =
-                new JPasswordField();
-
-        JPanel panel =
-                new JPanel(
-                        new GridLayout(3, 2, 5, 5)
-                );
-
-        panel.add(
-                new JLabel("Current Password:")
-        );
-
-        panel.add(currentPassword);
-
-        panel.add(
-                new JLabel("New Password:")
-        );
-
-        panel.add(newPassword);
-
-        panel.add(
-                new JLabel("Confirm Password:")
-        );
-
-        panel.add(confirmPassword);
-
-        int result =
-                JOptionPane.showConfirmDialog(
-                        this,
-                        panel,
-                        "Change Password",
-                        JOptionPane.OK_CANCEL_OPTION
-                );
-
-        if (result != JOptionPane.OK_OPTION) {
-            return;
-        }
-
-        String current =
-                new String(
-                        currentPassword.getPassword()
-                );
-
-        String newPass =
-                new String(
-                        newPassword.getPassword()
-                );
-
-        String confirm =
-                new String(
-                        confirmPassword.getPassword()
-                );
-
-        if (current.isEmpty()
-                || newPass.isEmpty()
-                || confirm.isEmpty()) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Please fill in all fields."
-            );
-
-            return;
-        }
-
-        if (!newPass.equals(confirm)) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "New passwords do not match!",
-                    "Password Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        if (current.equals(newPass)) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "New password must be different "
-                    + "from current password."
-            );
-
-            return;
-        }
-
-        boolean success =
-                managerFunction.changePassword(
-                        userID,
-                        current,
-                        newPass
-                );
-
-        if (success) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Password changed successfully!"
-            );
-
-        } else {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Current password is incorrect.",
-                    "Password Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-    // ============================================================
-    // 9. LOGOUT
-    // ============================================================
-
-    private void logout() {
-
-        int confirm =
-                JOptionPane.showConfirmDialog(
-                        this,
-                        "Are you sure you want to logout?",
-                        "Logout",
-                        JOptionPane.YES_NO_OPTION
-                );
-
-        if (confirm == JOptionPane.YES_OPTION) {
-
-            dispose();
-
-            new LoginGUI();
-        }
-    }
-}
+   

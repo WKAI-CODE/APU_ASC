@@ -1,1 +1,0 @@
-paymentID|appointmentID|amount|paymentMethod|paymentDate|counterStaffID

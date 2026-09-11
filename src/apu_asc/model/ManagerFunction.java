@@ -125,7 +125,7 @@ public class ManagerFunction{
 
             } else if (role.equals("CounterStaff")) {
 
-                prefix = "C";
+                prefix = "CS";
 
             } else if (role.equals("Technician")) {
 
@@ -421,14 +421,43 @@ public class ManagerFunction{
                 unpaidCount++;
             }
         }
+        
+        //Calculate total revenue
+        double totalRevenue = paidRevenue + unpaidAmount;
+        
+        //CALCULATE REVENUE PERCENTAGE
+        double paidRevenuePercentage = 0;
+        double unpaidAmountPercentage = 0;
+        
+        if(totalRevenue > 0){
+            paidRevenuePercentage = paidRevenue * 100.0 / totalRevenue;
+            
+            unpaidAmountPercentage = unpaidAmount * 100.0 / totalRevenue;
+            
+        }
+        
 
-        return "===== REVENUE REPORT =====\n\n"
+        return 
+                "===== REVENUE REPORT =====\n\n"
+
+                + "Total Revenue       : RM "
+                + df.format(totalRevenue) + "\n\n"
+
                 + "Paid Revenue        : RM "
-                + df.format(paidRevenue) + "\n"
+                + df.format(paidRevenue)
+                + " ("
+                + df.format(paidRevenuePercentage)
+                + "%)\n"
+
                 + "Unpaid Amount       : RM "
-                + df.format(unpaidAmount) + "\n\n"
+                + df.format(unpaidAmount)
+                + " ("
+                + df.format(unpaidAmountPercentage)
+                + "%)\n\n"
+
                 + "Paid Appointments   : "
                 + paidCount + "\n"
+
                 + "Unpaid Appointments : "
                 + unpaidCount;
     }
@@ -523,6 +552,73 @@ public class ManagerFunction{
         }
 
         return output.toString();
+    }
+    
+    
+    //MONTHLY APPOINTMENT ANALYSIS
+    public String monthlyAppointmentAnalysis(int selectedYear){
+        int[] monthlyCount = new int[12];
+        
+        for(Appointment appointment : DataIO.allAppointments){
+            
+            String date = appointment.getDate();
+            
+            String[] parts = date.split("/");
+            
+            int month = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]);
+            
+            if (year == selectedYear){
+                monthlyCount[month - 1]++ ;
+            }
+        }
+        
+        int total = 0;
+        
+        for(int i = 0; i<12 ;i++){
+            total += monthlyCount[i];
+        }
+        
+        String output = 
+                "===== MONTHLY APPOINTMENT ANALYSIS =====\n\n"
+                + "Year: " + selectedYear + "\n\n"
+                + "Total Appointments : " + total + "\n\n";
+        
+        String[] monthNames = {
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        };
+        
+        
+        
+        for (int i = 0 ; i <12 ; i++){
+            double percentage = 0;
+            
+            if(total  > 0){
+                percentage = monthlyCount[i] * 100.0 / total;
+                                
+            }
+            
+            output = output
+                    + monthNames[i]
+                    + " : "
+                    + monthlyCount[i]
+                    + " appointments ("
+                    + df.format(percentage)
+                    + "%)\n";
+            
+        }
+        return output;
     }
     
     

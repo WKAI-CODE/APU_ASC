@@ -3,20 +3,19 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
             <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/gui/LoginGUI.java</file>
-            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/apu_asc/APU_ASC.java</file>
-            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/utility/DataIO.java</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/data/appointments.txt</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/apu_asc/model/User.java</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/apu_asc/model/Technician.java</file>
             <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/apu_asc/model/ManagerFunction.java</file>
-=======
-            <file>file:/C:/Users/User/OneDrive/Documents/APU/Sem%203/OOP/Assignment/Assignment_Java_files/APU_ASC/src/apu_asc/model/Car.java</file>
->>>>>>> Stashed changes
-            <file>file:/C:/Users/User/OneDrive/Documents/APU/Sem%203/OOP/Assignment/Assignment_Java_files/APU_ASC/src/apu_asc/APU_ASC.java</file>
-            <file>file:/C:/Users/User/OneDrive/Documents/APU/Sem%203/OOP/Assignment/Assignment_Java_files/APU_ASC/src/apu_asc/model/Appointment.java</file>
-            <file>file:/C:/Users/User/OneDrive/Documents/APU/Sem%203/OOP/Assignment/Assignment_Java_files/APU_ASC/src/apu_asc/model/CounterStaff.java</file>
->>>>>>> bd58bd1e2e9b19c6fd29c99b7dd8dba04af79496
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/gui/ManagerGUI.java</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/apu_asc/model/TechnicianFeedback.java</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/apu_asc/APU_ASC.java</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/data/customer_comments.txt</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/data/service_prices.txt</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/data/technician_feedback.txt</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/data/users.txt</file>
+            <file>file:/C:/Users/kaizh/OneDrive%20-%20Asia%20Pacific%20University%20of%20Technology%20And%20Innovation%20(APU)/Documents/GitHub/APU_ASC/src/utility/DataIO.java</file>
         </group>
     </open-files>
 </project-private>
