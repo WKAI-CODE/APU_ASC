@@ -438,7 +438,453 @@ public class ManagerGUI extends JFrame implements ActionListener {
         
         
         //VIEW STAFF
+        private void viewStaff(){
             
+            ArrayList<Staff> staffList = managerFunction.getAllStaff();
+            
+            if(staffList.isEmpty()){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No staff found."
+                );
+                
+                return;
+                
+            }
+            
+            String output = "===== STAFF LIST =====\n\n";
+            
+            for(Staff staff : staffList){
+                
+                output =
+                    output
+                    + "User ID                : "
+                    + staff.getUserID()
+                    + "\n";
+
+                output =
+                        output
+                        + "Username           : "
+                        + staff.getUsername()
+                        + "\n";
+
+                output =
+                        output
+                        + "Name                  : "
+                        + staff.getName()
+                        + "\n";
+
+                output =
+                        output
+                        + "Phone Number   : "
+                        + staff.getPhoneNumber()
+                        + "\n";
+
+                output =
+                        output
+                        + "Role                    : "
+                        + staff.getRole()
+                        + "\n";
+
+                output =
+                        output
+                        + "Age                     : "
+                        + staff.getAge()
+                        + "\n";
+
+                output =
+                        output
+                        + "Identity Number  : "
+                        + staff.getIdentityNumber()
+                        + "\n";
+
+                output =
+                        output
+                        + "Email                  : "
+                        + staff.getEmail()
+                        + "\n";
+
+                output =
+                        output
+                        + "Address              : "
+                        + staff.getAddress()
+                        + "\n";
+
+                output =
+                        output
+                        + "--------------------------------\n";
+            }
+            
+            JTextArea textArea = new JTextArea(output);
+            
+            textArea.setEditable(false);
+            
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            
+            scrollPane.setPreferredSize(new Dimension(650,450));
+            
+            JOptionPane.showMessageDialog(
+                    this,
+                    scrollPane,
+                    "Staff List",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        }
+        
+        
+        
+        //UPDATE STAFF
+        private void updateStaff(){
+            
+            String userID = JOptionPane.showInputDialog(
+                    this,
+                    "Enter user ID to update:");
+            
+            if(userID == null || userID.trim().isEmpty()){
+                return;
+            }
+            
+            Staff staff = managerFunction.findStaff(userID.trim());
+            
+            if(staff == null){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Staff not found,",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                
+                return;
+            }
+            
+            String[] fields = {
+                "Username",
+                "Name",
+                "Phone number",
+                "Age",
+                "Identity number",
+                "Email",
+                "Address"
+            };
+             
+            
+            String field = 
+                    (String) JOptionPane.showInputDialog(
+                            this,
+                            "Select field to update",
+                            "Update staff",
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            fields,
+                            fields[0]
+                            
+                    );
+            
+            if(field == null){
+                return;
+            }
+            
+            String newValue = JOptionPane.showInputDialog(
+                    this,
+                    "Enter new " + field + ":"
+            );
+            
+            if(newValue == null || newValue.trim().isEmpty()) {
+                return;
+            }
+            
+            //USERNAME CHECK
+            if(field.equals("Username")){
+                Staff existing = managerFunction.findUsername(
+                        newValue.trim()
+                );
+                
+            if(existing!= null 
+                    && !existing.getUserID()
+                            .equalsIgnoreCase(
+                                    staff.getUserID())){
+                
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Username already exists.",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                
+                return;
+                               
+            }
+            }
+            
+            //PHONE CHECK
+            if (field.equals("Phone Number")
+                && !newValue.matches(
+                        "^(01)[0-9]{8,9}$")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid phone number.",
+                    "Invalid Input",
+                    JOptionPane.ERROR_MESSAGE);
+
+            return;
+        }
+            
+        
+        //IDENTITY CHECK
+        if(field.equals("Identity number") 
+                && !newValue.matches("^[0-9]{6}-[0-9]{2}-[0-9]{4}$")){
+            
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid identity number.",
+                    "Invalid Input",
+                    JOptionPane.ERROR_MESSAGE);
+
+            return;
+        
+        }
+        
+        //EMAIL CHECK
+        if(field.equals("Email")
+                && !newValue.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")){
+            
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid email format.",
+                    "Invalid Input",
+                    JOptionPane.ERROR_MESSAGE);
+
+            return;
+            
+        }
+        
+        Staff updatedStaff = managerFunction.updateStaff(
+                userID.trim(),
+                field,
+                newValue.trim()
+        );
+        
+        if(updatedStaff == null){
+            
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to update staff.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            
+            );
+            
+            return;
+            
+        }
+        
+        JOptionPane.showMessageDialog(this, "Staff updated successfully.");
+
+        }
+        
+        
+        
+        //DELETE STAFF
+        private void deleteStaff(){
+            
+            String userID = JOptionPane.showInputDialog(
+                    this,
+                    "Enter User ID to delete:"
+            );
+            
+            if (userID == null || userID.trim().isEmpty()){
+                return;
+            }
+            
+            Staff staff = managerFunction.findStaff(userID.trim());
+            
+            if(staff == null){
+                
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Staff not found",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                        
+                        return;
+                
+            }
+            
+            int choice = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to delete "
+                    + staff.getName()
+                    + " (" + staff.getUserID() + ")?",
+                    "Comfirm Delete",
+                    JOptionPane.YES_NO_OPTION
+            );
+            
+            
+            if(choice == JOptionPane.YES_OPTION){
+                
+                Staff deletedStaff = managerFunction.deleteStaff(userID.trim());
+                
+                if(deletedStaff != null){
+                    
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Staff deleted successfully"
+                    
+                    );
+                }else{
+                    
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Failed to delte staff",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    
+                }
+            
+            }
+                    
+        }
+        
+        
+        //SET SERVICE PRICE
+        private void setServicePrice(){
+            
+            String minorText = JOptionPane.showInputDialog(
+                    this,
+                    "Enter Minor Service Price:"
+            );
+            
+            if(minorText == null){
+                return;
+            }
+            
+            String majorText = JOptionPane.showInputDialog(
+                    this,
+                    "Enter Major Service Price:"
+            );
+            
+            if(majorText == null){
+                return;
+            }
+            
+            
+            try{
+                
+                double minorPrice = Double.parseDouble(majorText.trim());
+                
+                double majorPrice = Double.parseDouble(majorText.trim());
+                
+                String result = managerFunction.setServicePrice(
+                        minorPrice,
+                        majorPrice
+                );
+                
+                JOptionPane.showMessageDialog(
+                        this,
+                        result);
+                
+            }catch(NumberFormatException e){
+                
+                JOptionPane.showMessageDialog(
+                        this, 
+                        "Please enter valid prices.",
+                        "Invalid input",
+                        JOptionPane.ERROR_MESSAGE
+                        
+                                );
+                                        
+            }
+            
+            
+        }
+        
+        
+        //VIEW TECHNICIAN FEEDBACK
+        private void viewFeedback(){
+            
+            ArrayList<String> feedbackList = managerFunction.getTechnicianFeedback();
+            
+            if(feedbackList.isEmpty()){
+                
+                JOptionPane.showMessageDialog(
+                        this
+                        , "No technician feedback found.");
+                
+                return;
+                
+            }
+            
+            String output = "===== TECHNICIAN FEEDBACK =====\n\n";
+            
+            for(String feedback : feedbackList){
+                
+                output = 
+                        output
+                        +feedback
+                        + "\n"
+                        + "--------------------------------\n";
+            }
+            
+            JTextArea textArea = new JTextArea(output);
+            
+            textArea.setEditable(false);
+            
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            
+            scrollPane.setPreferredSize(new Dimension(700,450));
+            
+            JOptionPane.showMessageDialog(
+                    this, 
+                    scrollPane, 
+                    "Technician feedback", 
+                    JOptionPane.INFORMATION_MESSAGE);
+            
+        }
+        
+        
+        //VIEW CUSTOMER COMMENTS
+        public void viewComments(){
+            
+            ArrayList<String> commentList = managerFunction.getCustomerComments();
+            
+            if(commentList.isEmpty()){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No customer comments found."
+                );
+                
+                return;    
+                
+            }
+            
+            String output =  "===== CUSTOMER COMMENTS =====\n\n";
+            
+            for(String comment :commentList){
+                
+                output = 
+                        output
+                        + comment
+                        + "\n"
+                        + "--------------------------------\n";
+            }
+            
+            JTextArea textArea = new JTextArea(output);
+            
+            textArea.setEditable(false);
+            
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            
+            scrollPane.setPreferredSize(new Dimension(750,450));
+            
+            JOptionPane.showMessageDialog(
+                    this, 
+                    scrollPane, 
+                    "Customer Comments", 
+                    JOptionPane.INFORMATION_MESSAGE);
+            
+        }
+        
         }
 
    
