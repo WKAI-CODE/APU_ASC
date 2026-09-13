@@ -6,6 +6,7 @@ package apu_asc.model;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import apu_asc.utility.FileHandler;
+import apu_asc.utility.DataIO;
 import java.util.Scanner;
 
 public class CounterStaff extends Staff {
@@ -77,7 +78,7 @@ public class CounterStaff extends Staff {
             car.setYear(year);
             car.setColour(colour);
             
-            updateCarInFile(car);
+            DataIO.write();
         }
     }
     
@@ -511,7 +512,7 @@ public class CounterStaff extends Staff {
             customer.setName(name);
             customer.setPhoneNumber(phoneNumber);
 
-            updateCustomerInFile(customer);
+            DataIO.write();
         }
     }
     
@@ -625,39 +626,37 @@ public class CounterStaff extends Staff {
     }
     
     public Customer addCustomer(
-            Customer[] customers,
             String userID,
             String username,
             String password,
             String name,
             String phoneNumber) {
         
-        Customer existingCustomer = findCustomer(customers, userID);
+        Customer customerWithSameID = DataIO.checkCustomerID(userID);
         
-        boolean customerExistsFile = FileHandler.recordExists("data/users.txt", userID);
+        Staff staffWithSameID = DataIO.checkUserID(userID);
         
-        if (existingCustomer != null || customerExistsFile) {
-            return null;
-        }
+        Customer customerWithSameUsername = DataIO.checkCustomerUsername(username);
         
-        for (int i = 0; i < customers.length; i++) {
+        Staff staffWithSameUsername = DataIO.checkUsername(username);
+        
+        if (customerWithSameID != null || staffWithSameID != null || customerWithSameUsername != null || staffWithSameUsername != null) {
             
-            if (customers[i] == null) {
-                
-                Customer newCustomer = createCustomer(
-                        userID,
-                        username,
-                        password,
-                        name,
-                        phoneNumber);
-                
-                customers[i] = newCustomer;
-                saveCustomerToFile(newCustomer);
-                
-                return newCustomer;
-            }
-        }
-        return null;
+            return null;
+        }       
+        
+        Customer newCustomer = createCustomer(
+                userID,
+                username,
+                password,
+                name,
+                phoneNumber);
+
+        DataIO.allCustomers.add(newCustomer);
+        
+        DataIO.write();
+        
+        return newCustomer;
     }
     
     public void saveCarToFile(Car car) {
@@ -675,8 +674,6 @@ public class CounterStaff extends Staff {
     }
     
     public Car addCar(
-            Car[] cars,
-            Customer[] customers,
             String carID,
             String customerID,
             String registrationNumber,
@@ -685,42 +682,32 @@ public class CounterStaff extends Staff {
             int year,
             String colour) {
         
-        Customer owner = findCustomer(customers, customerID);
+        Customer owner = DataIO.checkCustomerID(customerID);
         
-        boolean ownerExistsInFile = isUserWithRoleInFile(customerID,"CUSTOMER");
-        
-        if (owner == null && !ownerExistsInFile) {
+        if (owner == null) {
             return null;
         }
         
-        Car existingCar = findCar(cars, carID);
+        Car existingCar = DataIO.checkCarID(carID);
         
-        boolean carExistsInFile = FileHandler.recordExists("data/cars.txt", carID);
-        
-        if (existingCar != null || carExistsInFile) {
+        if (existingCar != null) {
             return null;
         }
+
+        Car newCar = registerCar(
+                carID,
+                customerID,
+                registrationNumber,
+                brand,
+                model,
+                year,
+                colour);
+
+        DataIO.allCars.add(newCar);
         
-        for (int i = 0; i < cars.length; i++) {
-            
-            if(cars[i] == null) {
-                
-                Car newCar = registerCar(
-                        carID,
-                        customerID,
-                        registrationNumber,
-                        brand,
-                        model,
-                        year,
-                        colour);
-                
-                cars[i] = newCar;
-                saveCarToFile(newCar);
-                
-                return newCar;
-            }
-        }
-        return null;
+        DataIO.write();
+
+        return newCar;
     }
     
     public void saveAppointmentToFile(

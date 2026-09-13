@@ -1,1 +1,0 @@
-commentID|appointmentID|customerID|technicianRating|counterStaffRating|technicianComment|counterStaffComment|commentDate

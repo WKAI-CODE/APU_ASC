@@ -1,1 +1,0 @@
-feedbackID|appointmentID|technicianID|feedbackText|feedbackDate

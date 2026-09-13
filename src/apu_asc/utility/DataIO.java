@@ -57,6 +57,18 @@ public class DataIO {
     
     //READ
     public static void read() {
+        allStaff.clear();
+        allCustomers.clear();
+        allCars.clear();
+        allAppointments.clear();
+        allPayments.clear();
+        allReceipts.clear();
+        allTechnicianFeedback.clear();
+        allCustomerComments.clear();
+        
+        minorPrice = 0.0;
+        majorPrice = 0.0;
+        
         readUsers();
         readStaff();
         readCars();
@@ -74,7 +86,7 @@ public class DataIO {
         try{
             PrintWriter writer = new PrintWriter(USER_FILE);
             
-            writer.println("userID|username|password| + name|phoneNumber|role");
+            writer.println("userID|username|password|name|phoneNumber|role");
             
             //Save all Staff accounts
             for(int i = 0; i< allStaff.size(); i++){
@@ -101,6 +113,7 @@ public class DataIO {
                         + "|" + customer.getPassword()
                         + "|" + customer.getName()
                         + "|" + customer.getPhoneNumber()
+                        + "|" + customer.getRole()
                 );
             }
             
@@ -177,6 +190,8 @@ public class DataIO {
         try {
 
             PrintWriter writer = new PrintWriter(STAFF_FILE);
+            
+            writer.println("userID|age|identityNumber|email|address");
 
             for (int i = 0; i < allStaff.size(); i++) {
 
@@ -210,7 +225,7 @@ public class DataIO {
 
                 String line = scanner.nextLine();
 
-                if (line.trim().isEmpty()) {
+                if (line.trim().isEmpty() || line.startsWith("userID")) {
                     continue;
                 }
 
@@ -318,6 +333,8 @@ public class DataIO {
         try {
 
             PrintWriter writer = new PrintWriter(APPOINTMENT_FILE);
+            
+            writer.println("appointmentID|customerID|carID|" + "technicianID|counterStaffID|serviceType|" + "date|startTime|endTime|servicePrice|" + "appointmentStatus|paymentStatus");
 
             for (int i = 0; i < allAppointments.size(); i++) {
 
@@ -359,7 +376,7 @@ public class DataIO {
 
                 String line = scanner.nextLine();
 
-                if (line.trim().isEmpty()) {
+                if (line.trim().isEmpty() || line.startsWith("appointmentID|")) {
                     continue;
                 }
 
@@ -400,6 +417,8 @@ public class DataIO {
         try {
 
             PrintWriter writer = new PrintWriter(PAYMENT_FILE);
+            
+            writer.println("paymentID|appointmentID|amount|" + "paymentMethod|paymentDate|counterStaffID");
 
             for (int i = 0; i < allPayments.size(); i++) {
 
@@ -435,7 +454,7 @@ public class DataIO {
 
                 String line = scanner.nextLine();
 
-                if (line.trim().isEmpty()) {
+                if (line.trim().isEmpty() || line.startsWith("paymentID|")) {
                     continue;
                 }
 
@@ -543,6 +562,8 @@ public class DataIO {
 
             PrintWriter writer =
                     new PrintWriter(SERVICE_PRICE_FILE);
+            
+            writer.println("serviceType|durationHours|price");
 
             writer.println("MINOR|1|" + minorPrice);
             writer.println("MAJOR|3|" + majorPrice);
@@ -567,7 +588,7 @@ public class DataIO {
 
                 String line = scanner.nextLine();
 
-                if (line.trim().isEmpty()) {
+                if (line.trim().isEmpty() || line.startsWith("serviceType|")) {
                     continue;
                 }
 
@@ -607,6 +628,8 @@ public class DataIO {
 
             PrintWriter writer =
                     new PrintWriter(TECHNICIAN_FEEDBACK_FILE);
+            
+            writer.println("feedbackID|appointmentID|technicianID|" + "feedbackText|feedbackDate");
 
             for (int i = 0;
                  i < allTechnicianFeedback.size();
@@ -648,7 +671,7 @@ public class DataIO {
 
                 String line = scanner.nextLine();
 
-                if (line.trim().isEmpty()) {
+                if (line.trim().isEmpty() || line.startsWith("feedbackID|")) {
                     continue;
                 }
 
@@ -687,6 +710,8 @@ public class DataIO {
 
             PrintWriter writer =
                     new PrintWriter(CUSTOMER_COMMENT_FILE);
+            
+            writer.println("commentID|appointmentID|customerID|" + "technicianRating|counterStaffRating|" + "technicianComment|counterStaffComment|commentDate");
 
             for (int i = 0;
                  i < allCustomerComments.size();
@@ -731,7 +756,7 @@ public class DataIO {
 
                 String line = scanner.nextLine();
 
-                if (line.trim().isEmpty()) {
+                if (line.trim().isEmpty() || line.startsWith("commentID|")) {
                     continue;
                 }
 
@@ -793,4 +818,102 @@ public class DataIO {
 
         return null;
     }
+    
+    //CHECK CUSTOMER ID
+    public static Customer checkCustomerID(String customerID) {
+        
+        for (int i = 0; i < allCustomers.size(); i++) {
+            
+            Customer customer = allCustomers.get(i);
+            
+            if (customer.getUserID().equalsIgnoreCase(customerID)) {
+                
+                return customer;
+            }
+        }
+        
+        return null;
+    }
+    
+    //CHECK CUSTOMER USERNAME
+    public static Customer checkCustomerUsername(String username) {
+        
+        for (int i = 0; i < allCustomers.size(); i++) {
+            
+            Customer customer = allCustomers.get(i);
+            
+            if (customer.getUsername().equalsIgnoreCase(username)) {
+                
+                return customer;
+            }
+        }
+        
+        return null;
+    }
+    
+    
+    //CHECK CAR ID
+    public static Car checkCarID(String carID) {
+        
+        for (int i = 0; i < allCars.size(); i++) {
+            
+            Car car = allCars.get(i);
+            
+            if (car.getCarID().equalsIgnoreCase(carID)) {
+                
+                return car;
+            }
+        }
+        
+        return null;
+    }
+    
+    //CHECK APPOINTMENT ID
+    public static Appointment checkAppointmentID(String appointmentID) {
+        
+        for (int i = 0; i < allAppointments.size(); i++) {
+            
+            Appointment appointment = allAppointments.get(i);
+            
+            if (appointment.getAppointmentID().equalsIgnoreCase(appointmentID)) {
+                
+                return appointment;
+            }
+        }
+        
+        return null;
+    }
+    
+    //CHECK PAYMENT ID
+    public static Payment checkPaymentID(String paymentID) {
+        
+        for (int i = 0; i < allPayments.size(); i++) {
+            
+            Payment payment = allPayments.get(i);
+            
+            if (payment.getPaymentID().equalsIgnoreCase(paymentID)) {
+                
+                return payment;
+            }
+        }
+        
+        return null;
+    }
+    
+    //CHECK RECEIPT ID
+    public static Receipt checkReceiptID(String receiptID) {
+        
+        for (int i = 0; i < allReceipts.size(); i++) {
+            
+            Receipt receipt = allReceipts.get(i);
+            
+            if (receipt.getReceiptID().equalsIgnoreCase(receiptID)) {
+                
+                return receipt;
+            }
+        }
+        
+        return null;
+    }
 }
+
