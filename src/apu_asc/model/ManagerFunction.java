@@ -171,7 +171,7 @@ public class ManagerFunction{
         }else if (field.equals("Name")){
             staff.setName(newValue);
             
-        }else if(field.equals("Phone Number")){
+        }else if(field.equals("Phone number")){
             staff.setPhoneNumber(newValue);
             
         }else if(field.equals("Age")){
@@ -179,7 +179,7 @@ public class ManagerFunction{
             try{
                 int age = Integer.parseInt(newValue);
                 
-                if(age <= 0){
+                if(age < 18 || age > 65){
                     return null;
                 }
                 
@@ -190,7 +190,7 @@ public class ManagerFunction{
             }
             
             
-        }else if(field.equals("Identity Number")){
+        }else if(field.equals("Identity number")){
             staff.setIdentityNumber(newValue);
             
         }else if(field.equals("Email")){
@@ -238,7 +238,7 @@ public class ManagerFunction{
         
         DataIO.write();
         
-        return "Service prices updated succesfully";
+        return "Service prices updated successfully";
         
     }
     
@@ -251,7 +251,7 @@ public class ManagerFunction{
         for(TechnicianFeedback feedback : DataIO.allTechnicianFeedback){
             
             String line = 
-                    feedback.getTechnicianID() + "|"
+                    feedback.getFeedbackID() + "|"
                     + feedback.getAppointmentID() + "|"
                     + feedback.getTechnicianID() + "|"
                     + feedback.getFeedbackText() + "|"
@@ -354,7 +354,7 @@ public class ManagerFunction{
         
         }
         
-        int total = major + major;
+        int total = minor + major;
         
         double minorPercentage = 0;
         double majorPercentage = 0;
