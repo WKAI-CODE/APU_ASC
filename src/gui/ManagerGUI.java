@@ -883,6 +883,163 @@ public class ManagerGUI extends JFrame implements ActionListener {
                     "Customer Comments", 
                     JOptionPane.INFORMATION_MESSAGE);
             
+        }      
+        
+        
+        //GENERATE REPORT
+        private void generateReports(){
+        
+            String[] reports = {
+                "Appointment Status",
+                "Service Analysis",
+                "Revenue Report",
+                "Technician Performance",
+                "Monthly Appointment Analysis"
+            };
+            
+            String selectedReport = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Select Report:",
+                    "Generate Report",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    reports,
+                    reports[0]
+            );
+            
+            if(selectedReport == null){
+                return;
+            }
+            
+            String result = "";
+            
+            //APPOINTMENT STATUS
+            if(selectedReport.equals("Appointment Status")){
+                
+                result = managerFunction.appointmentStatusReport();
+                
+                
+            //SERVICE ANALYSIS    
+            }else if(selectedReport.equals("Service Analysis")){
+                
+                result = managerFunction.serviceAnalysisReport();
+                
+                
+            //REVENUE REPORT
+            }else if(selectedReport.equals("Revenue Report")){
+                
+                result = managerFunction.revenueReport();
+                
+            
+            //TECHNICIAN PERFORMANCE
+            }else if(selectedReport.equals("Technician Performance")){
+                
+                result = managerFunction.technicianPerformanceReport();
+              
+                
+            //MONTHLY APPOINTMENT
+            }else if(selectedReport.equals("Monthly Appointment Analysis")){
+                
+                String yearText = JOptionPane.showInputDialog(
+                        this,
+                        "Enter year:"
+                );
+                
+                if(yearText == null || yearText.trim().isEmpty()){
+                    return;
+                }
+                
+                try{
+                    
+                    int selectedYear = Integer.parseInt(yearText.trim());
+                    
+                    result = managerFunction.monthlyAppointmentAnalysis(selectedYear);
+                    
+                }catch(NumberFormatException e){
+                    
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Please enter a valid year.",
+                            "Invalid year",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    
+                    return;
+                    
+                }
+            }
+            
+            //DISPLAY REPORT
+            JTextArea textArea = new JTextArea(result);
+            
+            textArea.setEditable(false);
+            
+            textArea.setFont(new Font(
+                    "Monospaced",
+                    Font.PLAIN,
+                    14
+            ));
+            
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            
+            scrollPane.setPreferredSize(new Dimension(650,450));
+            
+            JOptionPane.showMessageDialog(
+                    this,
+                    scrollPane,
+                    selectedReport,
+                    JOptionPane.INFORMATION_MESSAGE
+                    
+            );
+        
+        }
+        
+        
+        //CHANGE PASSWORD
+        private void changePassword(){
+            
+            String currentPassword = JOptionPane.showInputDialog(
+                    this,
+                    "Enter current password"
+            );
+            
+            if(currentPassword == null){
+                return;
+            }
+            
+            String newPassword = JOptionPane.showInputDialog(
+                    this,
+                    "Enter new password:"
+            );
+            
+            if(newPassword == null){
+                return;
+            }
+            
+            String result = managerFunction.changePassword(
+                    staff.getUserID(),
+                    currentPassword,
+                    newPassword
+            );
+            
+        }
+        
+        //LOG OUT 
+        private void logout(){
+            int choice = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to logout?",
+                    "Logour",
+                    JOptionPane.YES_NO_OPTION
+            );
+            
+            if(choice == JOptionPane.YES_OPTION){
+                
+                dispose();
+                
+                new LoginGUI();
+                        
+            }
         }
         
         }
