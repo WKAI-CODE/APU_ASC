@@ -617,7 +617,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
             }
             
             //PHONE CHECK
-            if (field.equals("Phone Number")
+            if (field.equals("Phone number")
                 && !newValue.matches(
                         "^(01)[0-9]{8,9}$")) {
 
@@ -656,6 +656,39 @@ public class ManagerGUI extends JFrame implements ActionListener {
                     JOptionPane.ERROR_MESSAGE);
 
             return;
+            
+        }
+        
+        if(field.equals("Age")){
+            
+            try{
+                
+                int age = Integer.parseInt(newValue.trim());
+                
+                if(age < 18 || age > 65){
+                    
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Age must be between 18 and 65.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    
+                    return;
+                    
+                }
+                
+            }catch(NumberFormatException e){
+                
+                JOptionPane.showMessageDialog(
+                        this, 
+                        "Age must be a number", 
+                        "Invalid Input", 
+                        JOptionPane.ERROR_MESSAGE);
+                
+            return;
+                
+            }
             
         }
         
@@ -716,7 +749,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
                     "Are you sure you want to delete "
                     + staff.getName()
                     + " (" + staff.getUserID() + ")?",
-                    "Comfirm Delete",
+                    "Confirm Delete",
                     JOptionPane.YES_NO_OPTION
             );
             
@@ -736,7 +769,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
                     
                     JOptionPane.showMessageDialog(
                             this,
-                            "Failed to delte staff",
+                            "Failed to delete staff",
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                     
@@ -771,7 +804,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
             
             try{
                 
-                double minorPrice = Double.parseDouble(majorText.trim());
+                double minorPrice = Double.parseDouble(minorText.trim());
                 
                 double majorPrice = Double.parseDouble(majorText.trim());
                 
@@ -844,7 +877,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
         
         
         //VIEW CUSTOMER COMMENTS
-        public void viewComments(){
+        private void viewComments(){
             
             ArrayList<String> commentList = managerFunction.getCustomerComments();
             
@@ -1022,6 +1055,11 @@ public class ManagerGUI extends JFrame implements ActionListener {
                     newPassword
             );
             
+            JOptionPane.showMessageDialog(
+                    this,
+                    result
+            );
+            
         }
         
         //LOG OUT 
@@ -1029,7 +1067,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
             int choice = JOptionPane.showConfirmDialog(
                     this,
                     "Are you sure you want to logout?",
-                    "Logour",
+                    "Logout",
                     JOptionPane.YES_NO_OPTION
             );
             
