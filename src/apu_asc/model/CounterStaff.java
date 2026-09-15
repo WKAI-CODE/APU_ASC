@@ -5,9 +5,7 @@
 package apu_asc.model;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import apu_asc.utility.FileHandler;
 import apu_asc.utility.DataIO;
-import java.util.Scanner;
 
 public class CounterStaff extends Staff {
     
@@ -22,7 +20,7 @@ public class CounterStaff extends Staff {
             String email,
             String address) {
         
-        super(userID, username, password, name, phoneNumber, "COUNTER_STAFF", age, identityNumber, email, address);
+        super(userID, username, password, name, phoneNumber, "CounterStaff", age, identityNumber, email, address);
     }
     
     public Customer createCustomer(
@@ -82,12 +80,11 @@ public class CounterStaff extends Staff {
         }
     }
     
-    public Appointment bookAppointment(
+    private Appointment bookAppointment(
             String appointmentID,
             String customerID,
             String carID,
             String technicianID,
-            String counterStaffID,
             String serviceType,
             String date,
             String startTime,
@@ -99,7 +96,7 @@ public class CounterStaff extends Staff {
             customerID,
             carID,
             technicianID,
-            counterStaffID,
+            getUserID(),
             serviceType,
             date,
             startTime,
@@ -111,203 +108,197 @@ public class CounterStaff extends Staff {
         return appointment;
     }
     
-    public boolean isValidServiceDuration(
+    public String getServiceDurationError(
             String serviceType,
             String startTime,
             String endTime) {
-        
+
+        if (serviceType == null) {
+            return "Service type cannot be empty.";
+        }
+
         int startTotalMinutes = convertTimeToMinutes(startTime);
         int endTotalMinutes = convertTimeToMinutes(endTime);
-        
-        if (serviceType == null || startTotalMinutes == -1 || endTotalMinutes == -1){
-            
-            return false;
+
+        if (startTotalMinutes == -1 || endTotalMinutes == -1) {
+            return "Invalid time format. Please use HH:mm.";
         }
-        
+
         int durationMinutes = endTotalMinutes - startTotalMinutes;
-        
-        if (serviceType.compareTo("MINOR") == 0 && durationMinutes == 60) {
-            
-            return true;
-              
-        } else if (serviceType.compareTo("MAJOR") == 0 && durationMinutes == 180) {
-            
-            return true;
-            
-            
-        } else {
-            return false;
+
+        if (serviceType.equalsIgnoreCase("MINOR")) {
+
+            if (durationMinutes != 60) {return "Minor service must be exactly 1 hour.";
+            }
+
+            return null;
         }
+
+        if (serviceType.equalsIgnoreCase("MAJOR")) {
+
+            if (durationMinutes != 180) {return "Major service must be exactly 3 hours.";
+            }
+
+            return null;
+        }
+
+        return "Service type must be MINOR or MAJOR.";
     }
-    
+
     private int convertTimeToMinutes(String time) {
-        
+
         try {
             if (time == null || time.length() != 5 || time.charAt(2) != ':'){
-                
+
                 return -1;
             }
-            
+
             int hour = Integer.parseInt(time.substring(0, 2));
             int minute = Integer.parseInt(time.substring(3, 5));
-            
+
             if (hour < 0 || hour > 23 || minute < 0 || minute > 59){
-                
+
                 return -1;
             }
-            
+
             return (hour * 60) + minute;
-            
+
         } catch (Exception e) {
-            
+
             return -1;
         }
-    }
-    
-    public boolean isTechnicianAvailable(
-            Appointment existingAppointment,
-            String technicianID,
-            String date,
-            String startTime,
-            String endTime) {
-        
-        boolean sameTechnician = existingAppointment.getTechnicianID().compareTo(technicianID) == 0;
-        
-        boolean sameDate = existingAppointment.getDate().compareTo(date) == 0;
-        
-        boolean isCancelled = existingAppointment.getAppointmentStatus().compareTo("CANCELLED") == 0;
-        
-        if (sameTechnician && sameDate && !isCancelled){
-            
-            int existingStart = convertTimeToMinutes(existingAppointment.getStartTime());
-        
-            int existingEnd = convertTimeToMinutes(existingAppointment.getEndTime());
-            
-            int newStart = convertTimeToMinutes(startTime);
-            int newEnd = convertTimeToMinutes(endTime);
-            
-            boolean overlaps = newStart < existingEnd && newEnd > existingStart;
-            
-            if (overlaps) {
-                return false;
-            }           
         }
-        
-        return true;
-    }
     
-    public boolean isTechnicianAvailableForAll(
-            Appointment[] appointments,
+    public Appointment findConflictingAppointment(
             String technicianID,
             String date,
             String startTime,
             String endTime) {
         
-        for (int i = 0; i < appointments.length; i++) {
+        int newStart = convertTimeToMinutes(startTime);
+        int newEnd = convertTimeToMinutes(endTime);
+        
+        for (int i = 0; i < DataIO.allAppointments.size(); i++) {
             
-            if (appointments[i] != null) {
+            Appointment appointment = DataIO.allAppointments.get(i);
+            
+            if (appointment.getTechnicianID().equalsIgnoreCase(technicianID) && appointment.getDate().equals(date) && !"CANCELLED".equalsIgnoreCase(appointment.getAppointmentStatus())) {
                 
-                boolean available = 
-                        isTechnicianAvailable(
-                                appointments[i],
-                                technicianID,
-                                date,
-                                startTime,
-                                endTime);
+                int existingStart = convertTimeToMinutes(appointment.getStartTime());
                 
-                if (!available) {
-                    return false;
+                int existingEnd = convertTimeToMinutes(appointment.getEndTime());
+                
+                if (newStart < existingEnd && newEnd > existingStart) {
+                    return appointment;
                 }
-                
             }
         }
-        
-        return true;
+        return null;
     }
     
     public Appointment bookAppointmentWithValidation(
-            Appointment[] appointments,
             String appointmentID,
             String customerID,
             String carID,
             String technicianID,
-            String counterStaffID,
             String serviceType,
             String date,
             String startTime,
-            String endTime,
-            double servicePrice) {
+            String endTime) {
         
-        boolean validBookingDate = isValidBookingDate(date);
+        GregorianCalendar validBookingDate = getValidBookingDate(date);
         
-        if (!validBookingDate) {
+        if (validBookingDate == null) {
+            System.out.println("Failed: Booking date must be from tomorrow until the next 14 days.");
             return null;
         }
         
-        boolean withinWorkingHours = isWithinWorkingHours(startTime, endTime);
+        String workingHoursError = getWorkingHoursError(startTime, endTime);
         
-        if (!withinWorkingHours) {
+        if (workingHoursError != null) {
+            System.out.println("Failed: " + workingHoursError);
             return null;
         }
         
-        boolean validDuration = isValidServiceDuration(
-                serviceType,
-                startTime,
-                endTime);
-        
-        if (!validDuration) {
+        String serviceDurationError = getServiceDurationError(
+                        serviceType,
+                        startTime,
+                        endTime);
+
+        if (serviceDurationError != null) {
+            System.out.println("Failed: " + serviceDurationError);
             return null;
         }
         
-        servicePrice = getServicePriceFromFile(serviceType);
+        double servicePrice;
         
-        if (servicePrice < 0) {
-            System.out.println("Failed: service price not found");
-            return null;
-        }
-        
-        boolean customerExists = isUserWithRoleInFile(customerID, "CUSTOMER");
-        
-        if (!customerExists) {
-            System.out.println("Failed: Customer does not exist");
-            return null;
-        }
-        
-        boolean correctCarOwner = isCarOwnedByCustomerInFile(carID, customerID);
-        
-        if (!correctCarOwner) {
-            System.out.println("Failed: Car does not belong to the Customer");
-            return null;
-        }
-        
-        boolean technicianExists = isUserWithRoleInFile(technicianID, "TECHNICIAN");
-        
-        if (!technicianExists) {
-            System.out.println("Failed: Technician does not exist");
-            return null;
-        }
-        
-        boolean appointmentExistsInFile = FileHandler.recordExists("data/appointments.txt",appointmentID);
-        
-        if (appointmentExistsInFile) {
-            return null;
-        }
-        
-        for (int i = 0; i < appointments.length; i++) {
+        if ("MINOR".equalsIgnoreCase(serviceType)) {
             
-            if (appointments[i] != null && appointments[i].getAppointmentID().compareTo(appointmentID) == 0){
-                return null;
-            }
+            servicePrice = DataIO.minorPrice;
+            
+        } else if ("MAJOR".equalsIgnoreCase(serviceType)) {
+            
+            servicePrice = DataIO.majorPrice;
+            
+        } else {
+            
+            System.out.println("Failed: Invalid service type.");
+            return null;
         }
         
-        boolean technicianAvailable = isTechnicianAvailableForAll(
-                appointments,
-                technicianID,
-                date,
-                startTime,
-                endTime);
+        if (servicePrice <= 0) {
+            
+            System.out.println("Failed: Service price has not been set.");
+            return null;
+        }
         
-        if (!technicianAvailable) {
+        Customer customer = DataIO.checkCustomerID(customerID);
+        
+        if (customer == null) {
+            System.out.println("Failed: Customer does not exist.");
+            return null;
+        }
+        
+        Staff technician = DataIO.checkUserID(technicianID);
+        
+        if (technician == null) {
+            System.out.print("Failed: Technician does not exist.");
+            return null;
+        }
+        
+        if (!"TECHNICIAN".equalsIgnoreCase(technician.getRole())) {
+            
+            System.out.println("Failed: Selected staff is not a Technician.");
+            return null;
+        }
+        
+        Car car = DataIO.checkCarID(carID);
+        
+        if (car == null) {
+            System.out.println("Failed: Car does not exist.");
+            return null;
+        }
+        
+        if (!car.getCustomerID().equalsIgnoreCase(customerID)) {
+            System.out.println("Failed: Car does not belong to the Customer.");
+            return null;
+        }
+        
+        Appointment existingAppointment = DataIO.checkAppointmentID(appointmentID);
+        
+        if (existingAppointment != null) {
+            System.out.println("Failed: Appointment ID already exists.");
+            return null;
+        }
+
+        Appointment conflictingAppointment = findConflictingAppointment(
+                        technicianID,
+                        date,
+                        startTime,
+                        endTime);
+        
+        if (conflictingAppointment != null) {
+            System.out.println("Failed: Technician already has another appointment.");
             return null;
         }
         
@@ -317,282 +308,312 @@ public class CounterStaff extends Staff {
                         customerID,
                         carID,
                         technicianID,
-                        counterStaffID,
                         serviceType,
                         date,
                         startTime,
                         endTime,
                         servicePrice);
         
-        for (int i = 0; i < appointments.length; i++) {
-            
-            if (appointments[i] == null) {
-                appointments[i] = newAppointment;
-                saveAppointmentToFile(newAppointment);
-                return newAppointment;
-            }
-        }
-
-        return null;
+        DataIO.allAppointments.add(newAppointment);
+        DataIO.write();
+        
+        return newAppointment;
     }
     
-    public boolean isValidBookingDate(String date) {
+    public GregorianCalendar getValidBookingDate(String date) {
         
-        try{
-            if (date == null || date.length() != 10 || date.charAt(4) != '-' || date.charAt(7) != '-'){
-            
-                return false;
+        try {
+            if (date == null || date.length() != 10 || date.charAt(4) != '-' || date.charAt(7) != '-') {
+                return null;
             }
-
-            int year = Integer.parseInt(date.substring(0,4));
-            int month = Integer.parseInt(date.substring(5,7)) -1;
+            
+            int year = Integer.parseInt(date.substring(0, 4));
+            int month = Integer.parseInt(date.substring(5, 7)) - 1;
             int day = Integer.parseInt(date.substring(8, 10));
-
+            
             GregorianCalendar bookingDate = new GregorianCalendar(year, month, day);
-
-            boolean correctDate = bookingDate.get(Calendar.YEAR) == year && bookingDate.get(Calendar.MONTH) == month && bookingDate.get(Calendar.DATE) == day;
-
-            if (!correctDate) {
-                return false;
+            
+            if (bookingDate.get(Calendar.YEAR) != year || bookingDate.get(Calendar.MONTH) != month || bookingDate.get(Calendar.DATE) != day) {
+                return null;
             }
-
+            
             GregorianCalendar currentDate = new GregorianCalendar();
-
-            int currentYear = currentDate.get(Calendar.YEAR);
-            int currentMonth = currentDate.get(Calendar.MONTH);
-            int currentDay = currentDate.get(Calendar.DATE);
-
-
-
-            GregorianCalendar tomorrow = new GregorianCalendar(
-                        currentYear,
-                        currentMonth,
-                        currentDay);
-
+            
+            GregorianCalendar tomorrow = new GregorianCalendar(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE));
+            
             tomorrow.add(Calendar.DATE, 1);
-
+            
             GregorianCalendar lastBookingDate = new GregorianCalendar(
-                        currentYear,
-                        currentMonth,
-                        currentDay);
-
+                        currentDate.get(Calendar.YEAR),
+                       currentDate.get(Calendar.MONTH),
+                   currentDate.get(Calendar.DATE));
+            
             lastBookingDate.add(Calendar.DATE, 14);
-
-            boolean beforeTomorrow = tomorrow.after(bookingDate);
-
-            boolean afterLastBookingDate = bookingDate.after(lastBookingDate);
-
-            if (beforeTomorrow || afterLastBookingDate) {
-                return false;
+            
+            if (tomorrow.after(bookingDate) || bookingDate.after(lastBookingDate)) {
+                return null;
             }
-
-            return true;
-        
+            
+            return bookingDate;
+            
         } catch (Exception ex) {
-            return false;
+            return null;
         }
     }
     
-    public boolean isWithinWorkingHours(
+    
+    public String getWorkingHoursError(
             String startTime,
             String endTime) {
         
         int openingTime = convertTimeToMinutes("09:00");
         int closingTime = convertTimeToMinutes("18:00");
+        
         int appointmentStart = convertTimeToMinutes(startTime);
         int appointmentEnd = convertTimeToMinutes(endTime);
         
-        if (appointmentStart >= openingTime && appointmentEnd <= closingTime && appointmentStart < appointmentEnd){
-            
-            return true;
-            
-        } else {
-            return false;
+        if (appointmentStart == -1  || appointmentEnd == -1) {
+            return "Invalid time format. Please use HH:mm";
         }
+        
+        if (appointmentStart >= appointmentEnd) {
+            return "The end time must be later than the start time.";
+        }
+        
+        if (appointmentStart < openingTime || appointmentEnd > closingTime) {
+            return "Appointment must be between 09:00 and 18:00";
+        }
+        
+        return null;
     }
     
-    public Payment collectPayment(
-            Appointment appointment,
+        public Payment collectPayment(
+            String appointmentID,
             String paymentID,
             String paymentMethod,
-            String paymentDate,
-            String counterStaffID) {
-                    
+            String paymentDate) {
+
+        Appointment appointment = DataIO.checkAppointmentID(appointmentID);
+
         if (appointment == null) {
+            System.out.println("Failed: Appointment does not exist.");
             return null;
         }
-        
-        boolean completed = appointment.getAppointmentStatus().compareTo("COMPLETED") == 0;
-        
-        boolean unpaid = appointment.getPaymentStatus().compareTo("UNPAID") == 0;
-        
-        if (!completed || !unpaid) {
+
+        if (!"COMPLETED".equalsIgnoreCase(appointment.getAppointmentStatus())) {
+
+            System.out.println("Failed: Payment can only be collected after the appointment is completed.");
             return null;
         }
-        
-        boolean paymentIDExists = FileHandler.recordExists("data/payments.txt",paymentID);
-                
-        if (paymentIDExists) {
-        return null;
+
+        if (!"UNPAID".equalsIgnoreCase(appointment.getPaymentStatus())) {
+
+            System.out.println("Failed: This appointment has already been paid.");
+            return null;
         }
-            
-        Payment payment = new Payment(
-                paymentID,
-                appointment.getAppointmentID(),
-                appointment.getServicePrice(),
-                paymentMethod,
-                paymentDate,
-                counterStaffID);
+
+        Payment existingPayment = DataIO.checkPaymentID(paymentID);
+
+        if (existingPayment != null) {
+            System.out.println("Failed: Payment ID already exists.");
+            return null;
+        }
+
+        Payment newPayment =
+                new Payment(
+                        paymentID,
+                        appointmentID,
+                        appointment.getServicePrice(),
+                        paymentMethod,
+                        paymentDate,
+                        getUserID());
 
         appointment.setPaymentStatus("PAID");
-        updateAppointmentInFile(appointment);
-        savePaymentToFile(payment);
 
-        return payment;
+        DataIO.allPayments.add(newPayment);
+        DataIO.write();
+
+        return newPayment;
+    }
+        
+        public Receipt findReceiptByPaymentID(String paymentID) {
+
+        for (int i = 0; i < DataIO.allReceipts.size(); i++) {
+
+            Receipt receipt = DataIO.allReceipts.get(i);
+
+            if (receipt.getPaymentID().equalsIgnoreCase(paymentID)) {
+                return receipt;
+            }
         }
+
+        return null;
+    }
     
     public Receipt generateReceipt(
-            Payment payment,
-            Appointment appointment,
+            String paymentID,
             String receiptID,
             String customerID,
             String receiptDate) {
 
-        if (payment == null || appointment == null) {
-            return null;
-        }
-        
-        boolean paid = appointment.getPaymentStatus().compareTo("PAID") == 0;
- 
-        if (!paid) {
-            return null;
-        }
-        
-        boolean correctAppointment = payment.getAppointmentID().compareTo(appointment.getAppointmentID()) == 0;
-        
-        if (!correctAppointment) {
-            return null;
-        }
-        
-        boolean correctCustomer = appointment.getCustomerID().compareTo(customerID) == 0;
-        
-        if (!correctCustomer) {
-            return null;
-        }
-        
-        boolean receiptIDExists = FileHandler.recordExists("data/receipts.txt", receiptID);
-            
-        if (receiptIDExists){
-            return null;
-        }
-            
-        Receipt receipt = new Receipt(
-                receiptID,
-                payment.getPaymentID(),
-                appointment.getAppointmentID(),
-                customerID,
-                payment.getAmount(),
-                receiptDate);
+        Payment payment =
+                DataIO.checkPaymentID(paymentID);
 
-        saveReceiptToFile(receipt);
+        if (payment == null) {
+            System.out.println("Failed: Payment does not exist.");
+            return null;
+        }
 
-        return receipt;
+        Appointment appointment =
+                DataIO.checkAppointmentID(
+                        payment.getAppointmentID());
+
+        if (appointment == null) {
+            System.out.println("Failed: Appointment does not exist.");
+            return null;
+        }
+
+        if (!"PAID".equalsIgnoreCase(
+                appointment.getPaymentStatus())) {
+
+            System.out.println("Failed: Receipt can only be generated after payment.");
+            return null;
+        }
+
+        if (!appointment.getCustomerID()
+                .equalsIgnoreCase(customerID)) {
+
+            System.out.println("Failed: The appointment does not belong to this customer.");
+            return null;
+        }
+
+        Receipt existingReceipt =
+                DataIO.checkReceiptID(receiptID);
+
+        if (existingReceipt != null) {
+            System.out.println("Failed: Receipt ID already exists.");
+            return null;
+        }
+        
+        Receipt receiptForPayment =
+                findReceiptByPaymentID(paymentID);
+
+        if (receiptForPayment != null) {
+            System.out.println("Failed: A receipt has already been generated for this payment.");
+            return null;
+        }
+
+        Receipt newReceipt =
+                new Receipt(
+                        receiptID,
+                        paymentID,
+                        appointment.getAppointmentID(),
+                        customerID,
+                        payment.getAmount(),
+                        receiptDate);
+
+        DataIO.allReceipts.add(newReceipt);
+        DataIO.write();
+
+        return newReceipt;
     }
     
-    public void updateCustomerDetails(
+    public Customer updateCustomerDetails(
             Customer customer,
             String username,
             String password,
             String name,
             String phoneNumber) {
-        
-        if (customer != null) {
-            customer.setUsername(username);
-            customer.setPassword(password);
-            customer.setName(name);
-            customer.setPhoneNumber(phoneNumber);
 
-            DataIO.write();
+        if (customer == null) {
+            System.out.println("Failed: Customer does not exist.");
+            return null;
         }
+
+        Customer customerWithSameUsername =
+                DataIO.checkCustomerUsername(username);
+
+        Staff staffWithSameUsername =
+                DataIO.checkUsername(username);
+
+        if (customerWithSameUsername != null
+                && !customerWithSameUsername.getUserID()
+                        .equalsIgnoreCase(customer.getUserID())) {
+
+            System.out.println("Failed: Username is already used by another customer.");
+            return null;
+        }
+
+        if (staffWithSameUsername != null) {
+            System.out.println("Failed: Username is already used by a staff member.");
+            return null;
+        }
+
+        customer.setUsername(username); 
+        customer.setPassword(password);
+        customer.setName(name);
+        customer.setPhoneNumber(phoneNumber);
+
+        DataIO.write();
+
+        return customer;
     }
     
-    public Customer findCustomer(
-            Customer[] customers,
-            String customerID) {
+    public Customer deleteCustomer(String customerID){
+            
+        Customer customer = DataIO.checkCustomerID(customerID);
         
-        for (int i = 0; i < customers.length; i++) {
+        if (customer == null) {
+            return null;
+        }
         
-            if (customers[i] != null && customers[i].getUserID().compareTo(customerID) == 0) {
+        for (int i = 0; i < DataIO.allCars.size(); i++) {
+            
+            Car car = DataIO.allCars.get(i);
+            
+            if (car.getCustomerID().equalsIgnoreCase(customerID)) {
                 
-                return customers[i];
+                System.out.println("Customer cannot be deleted because they still own a car.");
+                
+                return null;
             }
         }
-        return null;
+        
+        DataIO.allCustomers.remove(customer);
+        
+        DataIO.write();
+        
+        return customer;
     }
     
-    public boolean deleteCustomer(
-            Customer[] customers,
-            String customerID) {
+    public Car deleteCar(String carID){
         
-        boolean hasCars = customerHasCarsInFile(customerID);
+        Car car = DataIO.checkCarID(carID);
         
-        if (hasCars) {
-            System.out.println("Customer cannot be deleted because they still own a car.");
-            
-            return false;
+        if (car == null) {
+            return null;
         }
         
-        for (int i = 0; i < customers.length; i++) {
+        for (int i = 0; i < DataIO.allAppointments.size(); i++) {
             
-            if (customers[i] != null && customers[i].getUserID().compareTo(customerID) == 0) {
+            Appointment appointment = DataIO.allAppointments.get(i);
+            
+            if (appointment.getCarID().equalsIgnoreCase(carID)) {
                 
-                customers[i] = null;
-                FileHandler.deleteRecord("data/users.txt", customerID);
-                return true;
+                System.out.println("Car cannot be deleted because it has appointment history.");
+                
+                return null;
             }
         }
-        return false;
+        
+        DataIO.allCars.remove(car);
+        
+        DataIO.write();
+        
+        return car;
     }
     
-    public Car findCar(
-            Car[] cars,
-            String carID) {
-        
-        for (int i = 0; i < cars.length; i++) {
-            
-            if (cars[i] != null && cars[i].getCarID().compareTo(carID) == 0) {
-                
-                return cars[i];
-            }
-        } 
-        return null;
-    }
-    
-    public boolean deleteCar(
-            Car[] cars,
-            String carID) {
-        
-        boolean hasAppointments = carHasAppointmentsInFile(carID);
-        
-        if (hasAppointments) {
-            System.out.println("Car cannot be deleted because it has appointment history.");
-            
-            return false;
-        }
-        
-        for (int i = 0; i < cars.length; i++) {
-            
-            if (cars[i] != null && cars[i].getCarID().compareTo(carID) == 0) {
-                
-                cars[i] = null;
-                FileHandler.deleteRecord("data/cars.txt",carID);
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public void editProfile(
+    public Staff editProfile(
             String username,
             String password,
             String name,
@@ -600,7 +621,42 @@ public class CounterStaff extends Staff {
             int age,
             String email,
             String address) {
-        
+
+        Staff savedCounterStaff =
+                DataIO.checkUserID(getUserID());
+
+        if (savedCounterStaff == null) {
+            System.out.println("Failed: Counter Staff account does not exist.");
+            return null;
+        }
+
+        Staff staffWithSameUsername =
+                DataIO.checkUsername(username);
+
+        Customer customerWithSameUsername =
+                DataIO.checkCustomerUsername(username);
+
+        if (staffWithSameUsername != null
+                && !staffWithSameUsername.getUserID()
+                        .equalsIgnoreCase(getUserID())) {
+
+            System.out.println("Failed: Username is already used by another staff member.");
+            return null;
+        }
+
+        if (customerWithSameUsername != null) {
+            System.out.println("Failed: Username is already used by a customer.");
+            return null;
+        }
+
+        savedCounterStaff.setUsername(username);
+        savedCounterStaff.setPassword(password);
+        savedCounterStaff.setName(name);
+        savedCounterStaff.setPhoneNumber(phoneNumber);
+        savedCounterStaff.setAge(age);
+        savedCounterStaff.setEmail(email);
+        savedCounterStaff.setAddress(address);
+
         setUsername(username);
         setPassword(password);
         setName(name);
@@ -608,21 +664,29 @@ public class CounterStaff extends Staff {
         setAge(age);
         setEmail(email);
         setAddress(address);
-        updateCounterStaffUserFile();
-        updateCounterStaffDetailsFile();
+
+        DataIO.write();
+
+        return savedCounterStaff;
     }
     
-    public void saveCustomerToFile(Customer customer) {
+    public String generateCustomerID() {
         
-        String customerData = 
-                customer.getUserID() + "|" 
-                + customer.getUsername() + "|"
-                + customer.getPassword() + "|"
-                + customer.getName() + "|"
-                + customer.getPhoneNumber()+"|"
-                + customer.getRole();
+        int number = DataIO.allCustomers.size() + 1;
         
-        FileHandler.appendFile("data/users.txt", customerData);                            
+        String customerID = String.format("C%03d", number);
+        
+        while (DataIO.checkCustomerID(customerID) != null 
+                || DataIO.checkUserID(customerID) != null 
+                || DataIO.checkCustomerUsername(customerID) != null
+                || DataIO.checkUsername(customerID) != null) {
+            
+            number ++;
+            
+            customerID = String.format("C%03d", number);
+        }
+        
+        return customerID;
     }
     
     public Customer addCustomer(
@@ -657,20 +721,6 @@ public class CounterStaff extends Staff {
         DataIO.write();
         
         return newCustomer;
-    }
-    
-    public void saveCarToFile(Car car) {
-        
-        String carData =
-                car.getCarID() + "|"
-                + car.getCustomerID() + "|"
-                + car.getRegistrationNumber() + "|"
-                + car.getBrand() + "|"
-                + car.getModel() + "|"
-                + car.getYear() + "|"
-                + car.getColour();
-        
-        FileHandler.appendFile("data/cars.txt",carData);
     }
     
     public Car addCar(
@@ -708,385 +758,5 @@ public class CounterStaff extends Staff {
         DataIO.write();
 
         return newCar;
-    }
-    
-    public void saveAppointmentToFile(
-            Appointment appointment) {
-        
-        String appointmentData =
-                appointment.getAppointmentID() + "|"
-                + appointment.getCustomerID() + "|"
-                + appointment.getCarID() + "|"
-                + appointment.getTechnicianID() + "|"
-                + appointment.getCounterStaffID() + "|"
-                + appointment.getServiceType() + "|"
-                + appointment.getDate() + "|"
-                + appointment.getStartTime() + "|"
-                + appointment.getEndTime() + "|"
-                + appointment.getServicePrice() + "|"
-                + appointment.getAppointmentStatus() + "|"
-                + appointment.getPaymentStatus();
-        
-        FileHandler.appendFile("data/appointments.txt", appointmentData);
-    }
-    
-    public void savePaymentToFile(Payment payment) {
-        
-        String paymentData =
-                payment.getPaymentID() + "|"
-                + payment.getAppointmentID() + "|"
-                + payment.getAmount() + "|"
-                + payment.getPaymentMethod() + "|"
-                + payment.getPaymentDate() + "|"
-                + payment.getCounterStaffID();
-        
-        FileHandler.appendFile("data/payments.txt", paymentData);
-    }
-    
-    public void saveReceiptToFile(Receipt receipt) {
-        
-        String receiptData =
-                receipt.getReceiptID() + "|"
-                + receipt.getPaymentID() + "|"
-                + receipt.getAppointmentID() + "|"
-                + receipt.getCustomerID() + "|"
-                + receipt.getAmount() + "|"
-                + receipt.getReceiptDate();
-        
-        FileHandler.appendFile("data/receipts.txt", receiptData);
-    }
-    
-    public boolean updateCustomerInFile(Customer customer) {
-        
-        String customerData = 
-                customer.getUserID() + "|" +
-                customer.getUsername() + "|" +
-                customer.getPassword() + "|" +
-                customer.getName() + "|" +
-                customer.getPhoneNumber() + "|" +
-                customer.getRole();
-        
-        return FileHandler.updateRecord("data/users.txt", customer.getUserID(), customerData);
-    }
-    
-    public boolean updateCarInFile(Car car) {
-        
-        String carData = 
-                car.getCarID() + "|" +
-                car.getCustomerID() + "|" +
-                car.getRegistrationNumber() + "|" +
-                car.getBrand() + "|" +
-                car.getModel() + "|" +
-                car.getYear() + "|" +
-                car.getColour();
-        
-        return FileHandler.updateRecord("data/cars.txt", car.getCarID(), carData);
-    }
-    
-    public boolean updateAppointmentInFile(
-            Appointment appointment) {
-
-        String appointmentData =
-                appointment.getAppointmentID() + "|"
-                + appointment.getCustomerID() + "|"
-                + appointment.getCarID() + "|"
-                + appointment.getTechnicianID() + "|"
-                + appointment.getCounterStaffID() + "|"
-                + appointment.getServiceType() + "|"
-                + appointment.getDate() + "|"
-                + appointment.getStartTime() + "|"
-                + appointment.getEndTime() + "|"
-                + appointment.getServicePrice() + "|"
-                + appointment.getAppointmentStatus() + "|"
-                + appointment.getPaymentStatus();
-
-        return FileHandler.updateRecord("data/appointments.txt", appointment.getAppointmentID(),appointmentData);
-    }
-
-    public Customer[] loadCustomersFromFile() {
-
-        String[] lines = FileHandler.readFileToArray("data/users.txt");
-
-        Customer[] customers = new Customer[lines.length + 10];
-
-        int position = 0;
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-
-            lineScanner.useDelimiter("\\|");
-
-            String userID = lineScanner.next();
-            String username = lineScanner.next();
-            String password = lineScanner.next();
-            String name = lineScanner.next();
-            String phoneNumber = lineScanner.next();
-            String role = lineScanner.next();
-
-            if (role.compareTo("CUSTOMER") == 0) {
-
-                customers[position] =
-                        createCustomer(
-                                userID,
-                                username,
-                                password,
-                                name,
-                                phoneNumber);
-                position++;
-            }
-            lineScanner.close();
-        }
-        return customers;
-    }
-
-    public Car[] loadCarsFromFile() {
-
-        String[] lines = FileHandler.readFileToArray("data/cars.txt");
-
-        Car[] cars = new Car[lines.length + 10];
-
-        int position = 0;
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-            lineScanner.useDelimiter("\\|");
-
-            String carID = lineScanner.next();
-            String customerID = lineScanner.next();
-            String registrationNumber = lineScanner.next();
-            String brand = lineScanner.next();
-            String model = lineScanner.next();
-
-            int year = Integer.parseInt(lineScanner.next());
-
-            String colour = lineScanner.next();
-
-            cars[position] = registerCar(
-                    carID,
-                    customerID,
-                    registrationNumber,
-                    brand,
-                    model,
-                    year,
-                    colour);
-
-            position++;
-
-            lineScanner.close();
-        }
-        return cars;
-    }
-
-    public Appointment[] loadAppointmentsFromFile() {
-
-        String[] lines = FileHandler.readFileToArray("data/appointments.txt");
-
-        Appointment[] appointments = new Appointment[lines.length + 10];
-
-        int position = 0;
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-            lineScanner.useDelimiter("\\|");
-
-            String appointmentID = lineScanner.next();
-            String customerID = lineScanner.next();
-            String carID = lineScanner.next();
-            String technicianID = lineScanner.next();
-            String counterStaffID = lineScanner.next();
-            String serviceType = lineScanner.next();
-            String date = lineScanner.next();
-            String startTime = lineScanner.next();
-            String endTime = lineScanner.next();
-            double servicePrice = Double.parseDouble(lineScanner.next());
-            String appointmentStatus = lineScanner.next();
-            String paymentStatus = lineScanner.next();
-
-            appointments[position] = 
-                    new Appointment(
-                            appointmentID,
-                            customerID,
-                            carID,
-                            technicianID,
-                            counterStaffID,
-                            serviceType,
-                            date,
-                            startTime,
-                            endTime,
-                            servicePrice,
-                            appointmentStatus,
-                            paymentStatus);
-
-            position++;
-
-            lineScanner.close();
-        }
-        return appointments;
-    }
-
-    public double getServicePriceFromFile(
-            String serviceType) {
-
-        String[] lines = FileHandler.readFileToArray("data/service_prices.txt");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-
-            lineScanner.useDelimiter("\\|");
-
-            String fileServiceType = lineScanner.next();
-            String durationHours = lineScanner.next();
-            double price = Double.parseDouble(lineScanner.next());
-
-            lineScanner.close();
-
-            if (fileServiceType.compareTo(serviceType) == 0) {
-
-                return price;
-            }
-        }
-
-        return -1;
-    }
-
-    public boolean isUserWithRoleInFile(
-            String userID,
-            String requiredRole) {
-
-        String[] lines = FileHandler.readFileToArray("data/users.txt");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-
-            lineScanner.useDelimiter("\\|");
-
-            String fileUserID = lineScanner.next();
-            String username = lineScanner.next();
-            String password = lineScanner.next();
-            String name = lineScanner.next();
-            String phoneNumber = lineScanner.next();
-            String role = lineScanner.next();
-
-            lineScanner.close();
-
-            if (fileUserID.compareTo(userID) == 0 && role.compareTo(requiredRole) == 0){
-
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean customerHasCarsInFile(String customerID) {
-
-        String[] lines = FileHandler.readFileToArray("data/cars.txt");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-
-            lineScanner.useDelimiter("\\|");
-
-            lineScanner.next(); // Skip CarID
-            String fileCustomerID = lineScanner.next();
-
-            lineScanner.close();
-
-            if (fileCustomerID.compareTo(customerID) == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean carHasAppointmentsInFile(String carID){
-
-        String[] lines = FileHandler.readFileToArray("data/appointments.txt");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-            lineScanner.useDelimiter("\\|");
-
-            lineScanner.next(); //Skip appointmentID
-            lineScanner.next(); //Skip customerID
-
-            String fileCarID = lineScanner.next();
-
-            lineScanner.close();
-
-            if (fileCarID.compareTo(carID) == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isCarOwnedByCustomerInFile(
-            String carID,
-            String customerID) {
-
-        String[] lines = FileHandler.readFileToArray("data/cars.txt");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            Scanner lineScanner = new Scanner(lines[i]);
-
-            lineScanner.useDelimiter("\\|");
-
-            String fileCarID = lineScanner.next();
-            String fileCustomerID = lineScanner.next();
-
-            lineScanner.close();
-
-            if (fileCarID.compareTo(carID) == 0 && fileCustomerID.compareTo(customerID) == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean updateCounterStaffUserFile() {
-
-        String userData =
-                getUserID() + "|" +
-                getUsername() + "|" +
-                getPassword() + "|" +
-                getName() + "|" +
-                getPhoneNumber() + "|" +
-                getRole();
-
-        if (FileHandler.recordExists("data/users.txt",getUserID())) {
-
-            return FileHandler.updateRecord("data/users.txt", getUserID(), userData);
-        }
-
-        FileHandler.appendFile("data/users.txt", userData);
-
-        return true;
-    }
-
-    public boolean updateCounterStaffDetailsFile() {
-
-        String staffData =
-                getUserID() + "|" +
-                getAge() + "|" +
-                getIdentityNumber() + "|" +
-                getEmail() + "|" +
-                getAddress();
-
-        if (FileHandler.recordExists("data/staff.txt",getUserID())) {
-
-            return FileHandler.updateRecord("data/staff.txt", getUserID(),staffData);    
-        }
-
-        FileHandler.appendFile("data/staff.txt", staffData);
-
-        return true;
     }
 }

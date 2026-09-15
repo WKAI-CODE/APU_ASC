@@ -1,6 +1,6 @@
 package apu_asc.utility;
 
-
+import apu_asc.model.CounterStaff;
 import apu_asc.model.Appointment;
 import apu_asc.model.Car;
 import apu_asc.model.Customer;
@@ -145,7 +145,7 @@ public class DataIO {
                     String phoneNumber = data[4];
                     String role = data[5];
                     
-                    if (role.equalsIgnoreCase("CUSTOMER")) {
+                    if (role.equalsIgnoreCase("Customer")) {
                         
                         Customer customer = new Customer(
                                 userID,
@@ -156,6 +156,22 @@ public class DataIO {
                         );
                         
                         allCustomers.add(customer);
+                        
+                    } else if (role.equalsIgnoreCase("CounterStaff")) {
+                        
+                        CounterStaff counterStaff = new CounterStaff(
+                                userID,
+                                username,
+                                password,
+                                name,
+                                phoneNumber,
+                                0,
+                                "",
+                                "",
+                                ""
+                        );
+                        
+                        allStaff.add(counterStaff);
                         
                     } else {
                     

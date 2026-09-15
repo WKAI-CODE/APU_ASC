@@ -2,6 +2,7 @@ package gui;
 
 import apu_asc.model.Staff;
 import apu_asc.utility.DataIO;
+import apu_asc.utility.CounterStaffDashboardGUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -175,8 +176,10 @@ public class LoginGUI extends JFrame implements ActionListener{
             if(staff.getRole().equals("Manager")){
                 new ManagerGUI(staff);
                 
-            }else if (staff.getRole().equals("CounterStaff")){
-                new CounterStaffGUI(staff);
+            }else if (staff.getRole().equalsIgnoreCase("CounterStaff")){
+                
+                new CounterStaffDashboardGUI(staff);
+                this.dispose();
                     
             } else if (staff.getRole().equals("Technician")) {
 
