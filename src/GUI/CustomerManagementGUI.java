@@ -5,6 +5,7 @@
 package GUI;
 import apu_asc.model.CounterStaff;
 import apu_asc.model.Customer;
+import apu_asc.utility.DataIO;
 import java.awt.Button;
 import java.awt.FlowLayout;
 import java.awt.Label;
@@ -67,9 +68,9 @@ public class CustomerManagementGUI implements ActionListener {
                 } else {
                     
                     JOptionPane.showMessageDialog(x, "Customer added successfully!"
-                                                                        + "\n\nCustomer ID: " + userID
-                                                                        + "\n\nDefault username: " + username
-                                                                        + "\n\nDefault password: " + password);
+                                                                + "\n\nCustomer ID: " + userID
+                                                                + "\n\nDefault username: " + username
+                                                                + "\n\nDefault password: " + password);
                     
                 }
             } catch (Exception ex) {
@@ -80,15 +81,171 @@ public class CustomerManagementGUI implements ActionListener {
 
         } else if (e.getSource() == viewCustomers) {
 
-            // View Customers GUI will be opened here later
+            if (DataIO.allCustomers.isEmpty()) {
+               
+               JOptionPane.showMessageDialog(x, "No Customer records found!");
+               
+            } else {
+               
+               String customerDetails = "Total Customers: " + DataIO.allCustomers.size() + "\n\n";
+               
+               for (int i = 0; i < DataIO.allCustomers.size(); i++) {
+                   
+                   Customer customer = DataIO.allCustomers.get(i);
+                   
+                   customerDetails += "Customer ID: " + customer.getUserID() + "\nUsername: " + customer.getUsername()
+                           + "\nName: " + customer.getName() + "\nPhone Number: " + customer.getPhoneNumber() + "\n------------------------------\n";
+               }
+               
+               JOptionPane.showMessageDialog(x, customerDetails);
+            }
+            
+        } else if (e.getSource() == searchCustomer) {
+            
+            try {
+                
+                String keyword = JOptionPane.showInputDialog(x, "Enter Customer ID, username, name or phone number:");
+                
+                if (keyword == null || keyword.trim().isEmpty()) {
+                    
+                    throw new Exception();
+                }
+                
+                keyword = keyword.trim();
+                
+                String searchResults = "";
+                
+                for (int i = 0; i < DataIO.allCustomers.size(); i++) {
+                    
+                    Customer customer = DataIO.allCustomers.get(i);
+                    
+                    if (customer.getUserID().equalsIgnoreCase(keyword) 
+                            || customer.getUsername().toLowerCase().contains(keyword.toLowerCase())
+                            || customer.getName().toLowerCase().contains(keyword.toLowerCase())
+                            || customer.getPhoneNumber().contains(keyword)) {
+                        
+                        searchResults += "Customer ID: "
+                                + customer.getUserID()
+                                + "\nUsername: "
+                                + customer.getUsername()
+                                + "\nName: "
+                                + customer.getName()
+                                + "\nPhone Number: "
+                                + customer.getPhoneNumber()
+                                + "\n------------------------------\n";
+                    }
+                }
+                
+                if (searchResults.length() == 0) {
+                    
+                    JOptionPane.showMessageDialog(x, "No matching Customer found!");
+                    
+                } else {
+                    
+                    JOptionPane.showMessageDialog(x, "Matching Customers:\n\n" + searchResults);
+                    
+                } 
+                
+            } catch (Exception ex) {
+                        
+                JOptionPane.showMessageDialog(x, "Invalid input!");
+
+            }           
 
         } else if (e.getSource() == updateCustomer) {
 
-            // Update Customer GUI will be opened here later
-
+            try {
+                
+                String customerID = JOptionPane.showInputDialog(x, "Enter Customer ID: ");
+                
+                if (customerID == null || customerID.trim().isEmpty()) {
+                    
+                    throw new Exception();
+                }
+                
+                Customer customer = DataIO.checkCustomerID(customerID.trim());
+                
+                if (customer == null) {
+                    
+                    JOptionPane.showMessageDialog(x, "Customer not found!");
+                    
+                } else {
+                    
+                    JOptionPane.showMessageDialog(x, "Current Customer Details" + "\n\nCustomerID: " + customer.getUserID()
+                                + "\nUsername: " + customer.getUsername() + "\nName: " + customer.getName() + "\nPhone Number: " + customer.getPhoneNumber());
+                
+                    String username = JOptionPane.showInputDialog(x, "Enter new username: ");
+                    String name = JOptionPane.showInputDialog(x, "Enter new name: ");
+                    String phoneNumber = JOptionPane.showInputDialog(x, "Enter new phone number: ");
+                    
+                    if (username == null || username.trim().isEmpty() || name == null
+                            || name.trim().isEmpty() || phoneNumber == null || phoneNumber.trim().isEmpty()) {
+                        
+                        throw new Exception();
+                    }
+                    
+                    Customer updatedCustomer = counterStaff.updateCustomerDetails(customer, username.trim(), customer.getPassword(), name.trim(), phoneNumber.trim());
+                    
+                    if (updateCustomer == null) {
+                        
+                        JOptionPane.showMessageDialog(x, "Username is already being used!");
+                        
+                    } else {
+                        
+                        JOptionPane.showMessageDialog(x, "Customer updated successfully!");
+                    }
+                }
+            } catch (Exception ex) {
+                
+                JOptionPane.showMessageDialog(x, "Invalid input!");
+            }
+                
         } else if (e.getSource() == deleteCustomer) {
 
-            // Delete Customer GUI will be opened here later
+            try {
+                
+                String customerID = JOptionPane.showInputDialog(x, "Enter Customer ID:");
+                
+                if (customerID == null || customerID.trim().isEmpty()) {
+                    
+                    throw new Exception();
+                }
+                
+                Customer customer = DataIO.checkCustomerID(customerID.trim());
+                
+                if (customer == null) {
+                    
+                    JOptionPane.showMessageDialog(x, "Customer not found!");
+                    
+                } else {
+                    
+                    String confirmation = JOptionPane.showInputDialog(x, "Customer ID: " + customer.getUserID()
+                                    + "\nName: " + customer.getName() + "\nPhone Number: " + customer.getPhoneNumber() + "\n\nType YES to delete this Customer:");
+                    
+                    if (confirmation == null || !confirmation.equalsIgnoreCase("YES")) {
+                        
+                        JOptionPane.showMessageDialog(x, "Deletion cancelled.");
+                        
+                    } else {
+                        
+                        Customer deletedCustomer = counterStaff.deleteCustomer(customer.getUserID());
+                        
+                        if (deletedCustomer == null) {
+                            
+                            JOptionPane.showMessageDialog(x, "This Customer cannot be deleted because the Customer still own a car.");
+                            
+                        } else {
+                            
+                            JOptionPane.showMessageDialog(x, "Customer deleted successfully!");
+                            
+                        }
+                    }
+                }
+                
+            } catch (Exception ex) {
+                
+                JOptionPane.showMessageDialog(x, "Invalid input!");
+            }
 
         } else if (e.getSource() == back) {
 
