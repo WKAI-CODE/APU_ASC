@@ -24,6 +24,7 @@ public class CustomerManagementGUI implements ActionListener {
 
     Button addCustomer;
     Button viewCustomers;
+    Button searchCustomer;
     Button updateCustomer;
     Button deleteCustomer;
     Button back;
@@ -77,7 +78,6 @@ public class CustomerManagementGUI implements ActionListener {
                 
                 JOptionPane.showMessageDialog(x, "Invalid input!");
             }
-        }
 
         } else if (e.getSource() == viewCustomers) {
 
@@ -186,7 +186,7 @@ public class CustomerManagementGUI implements ActionListener {
                     
                     Customer updatedCustomer = counterStaff.updateCustomerDetails(customer, username.trim(), customer.getPassword(), name.trim(), phoneNumber.trim());
                     
-                    if (updateCustomer == null) {
+                    if (updatedCustomer == null) {
                         
                         JOptionPane.showMessageDialog(x, "Username is already being used!");
                         
@@ -269,12 +269,14 @@ public class CustomerManagementGUI implements ActionListener {
 
         addCustomer = new Button("Add Customer");
         viewCustomers = new Button("View Customers");
+        searchCustomer = new Button("Search Customer");
         updateCustomer = new Button("Update Customer");
         deleteCustomer = new Button("Delete Customer");
         back = new Button("Back");
 
         addCustomer.addActionListener(this);
         viewCustomers.addActionListener(this);
+        searchCustomer.addActionListener(this);
         updateCustomer.addActionListener(this);
         deleteCustomer.addActionListener(this);
         back.addActionListener(this);
@@ -282,6 +284,7 @@ public class CustomerManagementGUI implements ActionListener {
         x.add(title);
         x.add(addCustomer);
         x.add(viewCustomers);
+        x.add(searchCustomer);
         x.add(updateCustomer);
         x.add(deleteCustomer);
         x.add(back);

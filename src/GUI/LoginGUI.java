@@ -1,8 +1,7 @@
-package gui;
+package GUI;
 
 import apu_asc.model.Staff;
 import apu_asc.utility.DataIO;
-import apu_asc.utility.CounterStaffDashboardGUI;
 
 import javax.swing.*;
 import java.awt.*;
