@@ -462,7 +462,88 @@ public class CounterStaff extends Staff {
         return null;
     }
     
-        public Payment collectPayment(
+    public String generatePaymentID() {
+
+        int number =
+                DataIO.allPayments.size() + 1;
+
+        String paymentID =
+                String.format(
+                        "P%03d",
+                        number
+                );
+
+        while (DataIO.checkPaymentID(
+                paymentID) != null) {
+
+            number++;
+
+            paymentID =
+                    String.format(
+                            "P%03d",
+                            number
+                    );
+        }
+
+        return paymentID;
+    }
+
+
+    public String generateReceiptID() {
+
+        int number =
+                DataIO.allReceipts.size() + 1;
+
+        String receiptID =
+                String.format(
+                        "R%03d",
+                        number
+                );
+
+        while (DataIO.checkReceiptID(
+                receiptID) != null) {
+
+            number++;
+
+            receiptID =
+                    String.format(
+                            "R%03d",
+                            number
+                    );
+        }
+
+        return receiptID;
+    }
+
+    public String getCurrentDate() {
+
+        GregorianCalendar currentDate =
+                new GregorianCalendar();
+
+        int year =
+                currentDate.get(
+                        Calendar.YEAR
+                );
+
+        int month =
+                currentDate.get(
+                        Calendar.MONTH
+                ) + 1;
+
+        int day =
+                currentDate.get(
+                        Calendar.DATE
+                );
+
+        return String.format(
+                "%04d-%02d-%02d",
+                year,
+                month,
+                day
+        );
+    }
+    
+    public Payment collectPayment(
             String appointmentID,
             String paymentID,
             String paymentMethod,

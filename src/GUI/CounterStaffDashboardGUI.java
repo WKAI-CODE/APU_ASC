@@ -38,6 +38,16 @@ public class CounterStaffDashboardGUI implements ActionListener {
 
             CarManagementGUI carManagementGUI = new CarManagementGUI(counterStaff);
             x.setVisible(false);
+           
+        } else if (e.getSource() == manageAppointments) {
+
+            AppointmentManagementGUI appointmentManagementGUI = new AppointmentManagementGUI(counterStaff);
+            x.setVisible(false);
+            
+        } else if (e.getSource() == payments) {
+
+            PaymentManagementGUI paymentManagementGUI = new PaymentManagementGUI(counterStaff);
+            x.setVisible(false);
 
         } else if (e.getSource() == logout) {
 
