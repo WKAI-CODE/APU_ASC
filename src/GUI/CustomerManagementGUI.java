@@ -249,7 +249,7 @@ public class CustomerManagementGUI implements ActionListener {
 
         } else if (e.getSource() == back) {
 
-            new CounterStaffDashboardGUI(counterStaff);
+            CounterStaffDashboardGUI counterStaffDashboardGUI = new CounterStaffDashboardGUI(counterStaff);
             x.setVisible(false);
         }
     }

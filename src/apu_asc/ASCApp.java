@@ -8,6 +8,7 @@ import apu_asc.model.Appointment;
 import apu_asc.model.Car;
 import apu_asc.model.CounterStaff;
 import apu_asc.model.Customer;
+import apu_asc.utility.DataIO;
 
 public class ASCApp {
 
@@ -26,11 +27,14 @@ public class ASCApp {
                 "IC001",
                 "ali@apu.edu.my",
                 "Kuala Lumpur");
-
-        // Load the records from the text files into memory.
-        Customer[] customers = staff1.loadCustomersFromFile();
-        Car[] cars = staff1.loadCarsFromFile();
-        Appointment[] appointments = staff1.loadAppointmentsFromFile();
+        
+        DataIO.read();
+        
+        Customer[] customers = DataIO.allCustomers.toArray(new Customer[0]);
+        
+        Car[] cars = DataIO.allCars.toArray(new Car[0]);
+        
+        Appointment[] appointments = DataIO.allAppointments.toArray(new Appointment[0]);
 
         int customerCount = countCustomers(customers);
         int carCount = countCars(cars);

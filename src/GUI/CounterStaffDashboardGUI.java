@@ -31,7 +31,7 @@ public class CounterStaffDashboardGUI implements ActionListener {
 
         if (e.getSource() == manageCustomers) {
 
-            new CustomerManagementGUI(counterStaff);
+            CustomerManagementGUI customerManagementGUI = new CustomerManagementGUI(counterStaff);
             x.setVisible(false);
 
         } else if (e.getSource() == logout) {
