@@ -169,6 +169,55 @@ public class CounterStaff extends Staff {
         }
         }
     
+    public String calculateEndTime(
+            String serviceType,
+            String startTime) {
+
+        int startTotalMinutes =
+                convertTimeToMinutes(startTime);
+
+        if (startTotalMinutes == -1) {
+            return null;
+        }
+
+        int durationMinutes;
+
+        if ("MINOR".equalsIgnoreCase(
+                serviceType)) {
+
+            durationMinutes = 60;
+
+        } else if ("MAJOR".equalsIgnoreCase(
+                serviceType)) {
+
+            durationMinutes = 180;
+
+        } else {
+
+            return null;
+        }
+
+        int endTotalMinutes =
+                startTotalMinutes
+                + durationMinutes;
+
+        if (endTotalMinutes >= 1440) {
+            return null;
+        }
+
+        int endHour =
+                endTotalMinutes / 60;
+
+        int endMinute =
+                endTotalMinutes % 60;
+
+        return String.format(
+                "%02d:%02d",
+                endHour,
+                endMinute
+        );
+    }
+    
     public Appointment findConflictingAppointment(
             String technicianID,
             String date,
@@ -196,6 +245,32 @@ public class CounterStaff extends Staff {
         return null;
     }
     
+    public String generateAppointmentID() {
+
+        int number =
+                DataIO.allAppointments.size() + 1;
+
+        String appointmentID =
+                String.format(
+                        "A%03d",
+                        number
+                );
+
+        while (DataIO.checkAppointmentID(
+                appointmentID) != null) {
+
+            number++;
+
+            appointmentID =
+                    String.format(
+                            "A%03d",
+                            number
+                    );
+        }
+
+        return appointmentID;
+    }
+
     public Appointment bookAppointmentWithValidation(
             String appointmentID,
             String customerID,
@@ -721,6 +796,22 @@ public class CounterStaff extends Staff {
         DataIO.write();
         
         return newCustomer;
+    }
+    
+    public String generateCarID() {
+
+        int number = DataIO.allCars.size() + 1;
+
+        String carID = String.format("CAR%03d",number);
+
+        while (DataIO.checkCarID(carID) != null) {
+
+            number++;
+
+            carID = String.format("CAR%03d",number);
+        }
+
+        return carID;
     }
     
     public Car addCar(
