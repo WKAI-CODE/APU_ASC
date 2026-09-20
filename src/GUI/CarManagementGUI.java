@@ -5,14 +5,22 @@ import apu_asc.model.CounterStaff;
 import apu_asc.model.Customer;
 import apu_asc.utility.DataIO;
 
-import java.awt.Button;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Label;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 public class CarManagementGUI
         implements ActionListener {
@@ -21,56 +29,14 @@ public class CarManagementGUI
 
     JFrame x;
 
-    Label title;
+    JLabel title;
 
-    Button addCar;
-    Button viewCars;
-    Button searchCar;
-    Button updateCar;
-    Button deleteCar;
-    Button back;
-
-    public CarManagementGUI(
-            CounterStaff counterStaff) {
-
-        this.counterStaff = counterStaff;
-
-        x = new JFrame();
-
-        x.setTitle("Car Management");
-        x.setSize(500, 200);
-        x.setLocation(550, 300);
-        x.setLayout(new FlowLayout());
-
-        title = new Label(
-                "Car Management",
-                Label.CENTER
-        );
-
-        addCar = new Button("Add Car");
-        viewCars = new Button("View Cars");
-        searchCar = new Button("Search Car");
-        updateCar = new Button("Update Car");
-        deleteCar = new Button("Delete Car");
-        back = new Button("Back");
-
-        addCar.addActionListener(this);
-        viewCars.addActionListener(this);
-        searchCar.addActionListener(this);
-        updateCar.addActionListener(this);
-        deleteCar.addActionListener(this);
-        back.addActionListener(this);
-
-        x.add(title);
-        x.add(addCar);
-        x.add(viewCars);
-        x.add(searchCar);
-        x.add(updateCar);
-        x.add(deleteCar);
-        x.add(back);
-
-        x.setVisible(true);
-    }
+    JButton addCar;
+    JButton viewCars;
+    JButton searchCar;
+    JButton updateCar;
+    JButton deleteCar;
+    JButton back;
 
     public void actionPerformed(ActionEvent e) {
 
@@ -78,21 +44,27 @@ public class CarManagementGUI
 
             try {
 
-                // Search for the Customer
-                String keyword =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter Customer ID, username, "
-                                + "name or phone number:"
-                        );
+                String keyword = JOptionPane.showInputDialog(
+                        x,
+                        "Enter Customer ID, username, "
+                        + "name or phone number:"
+                );
 
-                if (keyword == null
-                        || keyword.trim().isEmpty()) {
-
-                    throw new Exception();
+                if (keyword == null) {
+                    return;
                 }
 
                 keyword = keyword.trim();
+
+                if (keyword.isEmpty()) {
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Please enter a search keyword!"
+                    );
+
+                    return;
+                }
 
                 String customerResults = "";
                 int numberOfMatches = 0;
@@ -109,19 +81,14 @@ public class CarManagementGUI
                                 .equalsIgnoreCase(keyword)
                             || customer.getUsername()
                                 .toLowerCase()
-                                .contains(
-                                        keyword.toLowerCase()
-                                )
+                                .contains(keyword.toLowerCase())
                             || customer.getName()
                                 .toLowerCase()
-                                .contains(
-                                        keyword.toLowerCase()
-                                )
+                                .contains(keyword.toLowerCase())
                             || customer.getPhoneNumber()
                                 .contains(keyword)) {
 
                         numberOfMatches++;
-
                         owner = customer;
 
                         customerResults +=
@@ -137,7 +104,6 @@ public class CarManagementGUI
                     }
                 }
 
-                // No matching Customer
                 if (numberOfMatches == 0) {
 
                     JOptionPane.showMessageDialog(
@@ -148,7 +114,6 @@ public class CarManagementGUI
                     return;
                 }
 
-                // Several matching Customers
                 if (numberOfMatches > 1) {
 
                     JOptionPane.showMessageDialog(
@@ -164,16 +129,25 @@ public class CarManagementGUI
                                     + "you want to select:"
                             );
 
-                    if (selectedCustomerID == null
-                            || selectedCustomerID
-                                    .trim()
-                                    .isEmpty()) {
+                    if (selectedCustomerID == null) {
+                        return;
+                    }
 
-                        throw new Exception();
+                    selectedCustomerID =
+                            selectedCustomerID.trim();
+
+                    if (selectedCustomerID.isEmpty()) {
+
+                        JOptionPane.showMessageDialog(
+                                x,
+                                "Please enter a Customer ID!"
+                        );
+
+                        return;
                     }
 
                     owner = DataIO.checkCustomerID(
-                            selectedCustomerID.trim()
+                            selectedCustomerID
                     );
 
                     if (owner == null) {
@@ -187,90 +161,140 @@ public class CarManagementGUI
                     }
                 }
 
-                String customerID =
-                        owner.getUserID();
+                String customerID = owner.getUserID();
 
-                JOptionPane.showMessageDialog(
+                JTextField customerIDField =
+                        new JTextField(owner.getUserID());
+
+                JTextField customerNameField =
+                        new JTextField(owner.getName());
+
+                JTextField registrationNumberField =
+                        new JTextField(15);
+
+                JTextField brandField =
+                        new JTextField(15);
+
+                JTextField modelField =
+                        new JTextField(15);
+
+                JTextField yearField =
+                        new JTextField(15);
+
+                JTextField colourField =
+                        new JTextField(15);
+
+                customerIDField.setEditable(false);
+                customerNameField.setEditable(false);
+
+                JPanel addCarPanel =
+                        new JPanel(
+                                new GridLayout(7, 2, 10, 10)
+                        );
+
+                addCarPanel.add(new JLabel("Customer ID:"));
+                addCarPanel.add(customerIDField);
+
+                addCarPanel.add(new JLabel("Customer Name:"));
+                addCarPanel.add(customerNameField);
+
+                addCarPanel.add(
+                        new JLabel("Registration Number:")
+                );
+                addCarPanel.add(registrationNumberField);
+
+                addCarPanel.add(new JLabel("Brand:"));
+                addCarPanel.add(brandField);
+
+                addCarPanel.add(new JLabel("Model:"));
+                addCarPanel.add(modelField);
+
+                addCarPanel.add(new JLabel("Year:"));
+                addCarPanel.add(yearField);
+
+                addCarPanel.add(new JLabel("Colour:"));
+                addCarPanel.add(colourField);
+
+                int result = JOptionPane.showConfirmDialog(
                         x,
-                        "Selected Customer"
-                        + "\n\nCustomer ID: "
-                        + owner.getUserID()
-                        + "\nName: "
-                        + owner.getName()
-                        + "\nPhone Number: "
-                        + owner.getPhoneNumber()
+                        addCarPanel,
+                        "Register New Car",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE
                 );
 
-                // Enter the car information
+                if (result != JOptionPane.OK_OPTION) {
+                    return;
+                }
+
                 String registrationNumber =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter car registration number:"
-                        );
+                        registrationNumberField
+                                .getText()
+                                .trim();
 
                 String brand =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter car brand:"
-                        );
+                        brandField.getText().trim();
 
                 String model =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter car model:"
-                        );
+                        modelField.getText().trim();
 
                 String yearInput =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter car year:"
-                        );
+                        yearField.getText().trim();
 
                 String colour =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter car colour:"
-                        );
+                        colourField.getText().trim();
 
-                // Check whether any input is empty
-                if (registrationNumber == null
-                        || registrationNumber
-                                .trim()
-                                .isEmpty()
-                        || brand == null
-                        || brand.trim().isEmpty()
-                        || model == null
-                        || model.trim().isEmpty()
-                        || yearInput == null
-                        || yearInput.trim().isEmpty()
-                        || colour == null
-                        || colour.trim().isEmpty()) {
+                if (registrationNumber.isEmpty()
+                        || brand.isEmpty()
+                        || model.isEmpty()
+                        || yearInput.isEmpty()
+                        || colour.isEmpty()) {
 
-                    throw new Exception();
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Please complete all fields!"
+                    );
+
+                    return;
                 }
 
-                // Convert the year to an integer
-                int year = Integer.parseInt(
-                        yearInput.trim()
-                );
+                int year;
+
+                try {
+
+                    year = Integer.parseInt(yearInput);
+
+                } catch (NumberFormatException ex) {
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Car year must be a valid number!"
+                    );
+
+                    return;
+                }
 
                 if (year <= 0) {
-                    throw new Exception();
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Please enter a valid car year!"
+                    );
+
+                    return;
                 }
 
-                // Automatically generate the Car ID
                 String carID =
                         counterStaff.generateCarID();
 
-                // Create and save the new car
                 Car newCar = counterStaff.addCar(
                         carID,
                         customerID,
-                        registrationNumber.trim(),
-                        brand.trim(),
-                        model.trim(),
+                        registrationNumber,
+                        brand,
+                        model,
                         year,
-                        colour.trim()
+                        colour
                 );
 
                 if (newCar == null) {
@@ -278,6 +302,8 @@ public class CarManagementGUI
                     JOptionPane.showMessageDialog(
                             x,
                             "Unable to register the car!"
+                            + "\nThe registration number "
+                            + "may already exist."
                     );
 
                 } else {
@@ -289,7 +315,7 @@ public class CarManagementGUI
                             + newCar.getCarID()
                             + "\nCustomer ID: "
                             + newCar.getCustomerID()
-                            + "\nRegistration number: "
+                            + "\nRegistration Number: "
                             + newCar.getRegistrationNumber()
                             + "\nBrand: "
                             + newCar.getBrand()
@@ -306,7 +332,7 @@ public class CarManagementGUI
 
                 JOptionPane.showMessageDialog(
                         x,
-                        "Invalid input!"
+                        "Unable to register the car!"
                 );
             }
             
@@ -364,8 +390,8 @@ public class CarManagementGUI
                             + "\n------------------------------\n";
                 }
 
-                JOptionPane.showMessageDialog(
-                        x,
+                showScrollableResults(
+                        "Car Records",
                         carDetails
                 );
             }
@@ -455,10 +481,9 @@ public class CarManagementGUI
 
                 } else {
 
-                    JOptionPane.showMessageDialog(
-                            x,
-                            "Matching Cars:\n\n"
-                            + searchResults
+                    showScrollableResults(
+                            "Matching Cars",
+                            searchResults
                     );
                 }
 
@@ -474,20 +499,27 @@ public class CarManagementGUI
 
             try {
 
-                String keyword =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter Car ID, registration number, "
-                                + "Customer ID or customer name:"
-                        );
+                String keyword = JOptionPane.showInputDialog(
+                        x,
+                        "Enter Car ID, registration number, "
+                        + "Customer ID or customer name:"
+                );
 
-                if (keyword == null
-                        || keyword.trim().isEmpty()) {
-
-                    throw new Exception();
+                if (keyword == null) {
+                    return;
                 }
 
                 keyword = keyword.trim();
+
+                if (keyword.isEmpty()) {
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Please enter a search keyword!"
+                    );
+
+                    return;
+                }
 
                 String carResults = "";
                 int numberOfMatches = 0;
@@ -497,13 +529,11 @@ public class CarManagementGUI
                         i < DataIO.allCars.size();
                         i++) {
 
-                    Car car =
-                            DataIO.allCars.get(i);
+                    Car car = DataIO.allCars.get(i);
 
-                    Customer owner =
-                            DataIO.checkCustomerID(
-                                    car.getCustomerID()
-                            );
+                    Customer owner = DataIO.checkCustomerID(
+                            car.getCustomerID()
+                    );
 
                     String ownerName = "Unknown";
 
@@ -523,7 +553,6 @@ public class CarManagementGUI
                                 .contains(keyword.toLowerCase())) {
 
                         numberOfMatches++;
-
                         selectedCar = car;
 
                         carResults +=
@@ -531,9 +560,9 @@ public class CarManagementGUI
                                 + car.getCarID()
                                 + "\nCustomer ID: "
                                 + car.getCustomerID()
-                                + "\nCustomer name: "
+                                + "\nCustomer Name: "
                                 + ownerName
-                                + "\nRegistration number: "
+                                + "\nRegistration Number: "
                                 + car.getRegistrationNumber()
                                 + "\nBrand: "
                                 + car.getBrand()
@@ -564,17 +593,28 @@ public class CarManagementGUI
                     String selectedCarID =
                             JOptionPane.showInputDialog(
                                     x,
-                                    "Enter the Car ID you want to update:"
+                                    "Enter the Car ID "
+                                    + "you want to update:"
                             );
 
-                    if (selectedCarID == null
-                            || selectedCarID.trim().isEmpty()) {
+                    if (selectedCarID == null) {
+                        return;
+                    }
 
-                        throw new Exception();
+                    selectedCarID = selectedCarID.trim();
+
+                    if (selectedCarID.isEmpty()) {
+
+                        JOptionPane.showMessageDialog(
+                                x,
+                                "Please enter a Car ID!"
+                        );
+
+                        return;
                     }
 
                     selectedCar = DataIO.checkCarID(
-                            selectedCarID.trim()
+                            selectedCarID
                     );
 
                     if (selectedCar == null) {
@@ -588,91 +628,178 @@ public class CarManagementGUI
                     }
                 }
 
-                JOptionPane.showMessageDialog(
-                        x,
-                        "Current Car Details"
-                        + "\n\nCar ID: "
-                        + selectedCar.getCarID()
-                        + "\nCustomer ID: "
-                        + selectedCar.getCustomerID()
-                        + "\nRegistration number: "
-                        + selectedCar.getRegistrationNumber()
-                        + "\nBrand: "
-                        + selectedCar.getBrand()
-                        + "\nModel: "
-                        + selectedCar.getModel()
-                        + "\nYear: "
-                        + selectedCar.getYear()
-                        + "\nColour: "
-                        + selectedCar.getColour()
-                );
-
-                String registrationNumber =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter new registration number:",
-                                selectedCar.getRegistrationNumber()
+                Customer selectedOwner =
+                        DataIO.checkCustomerID(
+                                selectedCar.getCustomerID()
                         );
 
-                String brand =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter new brand:",
+                String selectedOwnerName = "Unknown";
+
+                if (selectedOwner != null) {
+                    selectedOwnerName =
+                            selectedOwner.getName();
+                }
+
+                JTextField carIDField =
+                        new JTextField(
+                                selectedCar.getCarID()
+                        );
+
+                JTextField customerIDField =
+                        new JTextField(
+                                selectedCar.getCustomerID()
+                        );
+
+                JTextField customerNameField =
+                        new JTextField(
+                                selectedOwnerName
+                        );
+
+                JTextField registrationNumberField =
+                        new JTextField(
+                                selectedCar
+                                        .getRegistrationNumber()
+                        );
+
+                JTextField brandField =
+                        new JTextField(
                                 selectedCar.getBrand()
                         );
 
-                String model =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter new model:",
+                JTextField modelField =
+                        new JTextField(
                                 selectedCar.getModel()
                         );
 
-                String yearInput =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter new year:",
+                JTextField yearField =
+                        new JTextField(
                                 String.valueOf(
                                         selectedCar.getYear()
                                 )
                         );
 
-                String colour =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter new colour:",
+                JTextField colourField =
+                        new JTextField(
                                 selectedCar.getColour()
                         );
 
-                if (registrationNumber == null
-                        || registrationNumber.trim().isEmpty()
-                        || brand == null
-                        || brand.trim().isEmpty()
-                        || model == null
-                        || model.trim().isEmpty()
-                        || yearInput == null
-                        || yearInput.trim().isEmpty()
-                        || colour == null
-                        || colour.trim().isEmpty()) {
+                carIDField.setEditable(false);
+                customerIDField.setEditable(false);
+                customerNameField.setEditable(false);
 
-                    throw new Exception();
-                }
+                JPanel updateCarPanel =
+                        new JPanel(
+                                new GridLayout(8, 2, 10, 10)
+                        );
 
-                int year = Integer.parseInt(
-                        yearInput.trim()
+                updateCarPanel.add(new JLabel("Car ID:"));
+                updateCarPanel.add(carIDField);
+
+                updateCarPanel.add(
+                        new JLabel("Customer ID:")
+                );
+                updateCarPanel.add(customerIDField);
+
+                updateCarPanel.add(
+                        new JLabel("Customer Name:")
+                );
+                updateCarPanel.add(customerNameField);
+
+                updateCarPanel.add(
+                        new JLabel("Registration Number:")
+                );
+                updateCarPanel.add(
+                        registrationNumberField
                 );
 
+                updateCarPanel.add(new JLabel("Brand:"));
+                updateCarPanel.add(brandField);
+
+                updateCarPanel.add(new JLabel("Model:"));
+                updateCarPanel.add(modelField);
+
+                updateCarPanel.add(new JLabel("Year:"));
+                updateCarPanel.add(yearField);
+
+                updateCarPanel.add(new JLabel("Colour:"));
+                updateCarPanel.add(colourField);
+
+                int result = JOptionPane.showConfirmDialog(
+                        x,
+                        updateCarPanel,
+                        "Update Car",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE
+                );
+
+                if (result != JOptionPane.OK_OPTION) {
+                    return;
+                }
+
+                String registrationNumber =
+                        registrationNumberField
+                                .getText()
+                                .trim();
+
+                String brand =
+                        brandField.getText().trim();
+
+                String model =
+                        modelField.getText().trim();
+
+                String yearInput =
+                        yearField.getText().trim();
+
+                String colour =
+                        colourField.getText().trim();
+
+                if (registrationNumber.isEmpty()
+                        || brand.isEmpty()
+                        || model.isEmpty()
+                        || yearInput.isEmpty()
+                        || colour.isEmpty()) {
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Please complete all fields!"
+                    );
+
+                    return;
+                }
+
+                int year;
+
+                try {
+
+                    year = Integer.parseInt(yearInput);
+
+                } catch (NumberFormatException ex) {
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Car year must be a valid number!"
+                    );
+
+                    return;
+                }
+
                 if (year <= 0) {
-                    throw new Exception();
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Please enter a valid car year!"
+                    );
+
+                    return;
                 }
 
                 counterStaff.updateCarDetails(
                         selectedCar,
-                        registrationNumber.trim(),
-                        brand.trim(),
-                        model.trim(),
+                        registrationNumber,
+                        brand,
+                        model,
                         year,
-                        colour.trim()
+                        colour
                 );
 
                 JOptionPane.showMessageDialog(
@@ -686,7 +813,7 @@ public class CarManagementGUI
 
                 JOptionPane.showMessageDialog(
                         x,
-                        "Invalid input!"
+                        "Unable to update the car!"
                 );
             }
             
@@ -885,5 +1012,299 @@ public class CarManagementGUI
 
             x.setVisible(false);
         }
+    }
+
+    private void showScrollableResults(
+            String windowTitle,
+            String results) {
+
+        JTextArea resultArea = new JTextArea(
+                results,
+                18,
+                45
+        );
+
+        resultArea.setEditable(false);
+        resultArea.setLineWrap(true);
+        resultArea.setWrapStyleWord(true);
+        resultArea.setCaretPosition(0);
+
+        JScrollPane scrollPane = new JScrollPane(
+                resultArea
+        );
+
+        JOptionPane.showMessageDialog(
+                x,
+                scrollPane,
+                windowTitle,
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    public CarManagementGUI(
+            CounterStaff counterStaff) {
+
+        this.counterStaff = counterStaff;
+
+        x = new JFrame();
+
+        x.setTitle("Car Management");
+        x.setSize(650, 350);
+        x.setLocation(430, 220);
+
+        x.setLayout(
+                new BorderLayout(10, 10)
+        );
+
+        // Header section
+        JPanel headerPanel = new JPanel();
+
+        headerPanel.setLayout(
+                new GridLayout(1, 3)
+        );
+
+        headerPanel.setBackground(Color.blue);
+
+        // Back button on the left
+        JPanel backPanel = new JPanel();
+
+        backPanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.LEFT,
+                        15,
+                        10
+                )
+        );
+
+        backPanel.setBackground(Color.blue);
+
+        back = new JButton("   Back   ");
+
+        back.setFont(
+                new Font(
+                        "SansSerif",
+                        Font.BOLD,
+                        14
+                )
+        );
+
+        backPanel.add(back);
+
+        // Title in the centre
+        JPanel titlePanel = new JPanel();
+
+        titlePanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        10,
+                        15
+                )
+        );
+
+        titlePanel.setBackground(Color.blue);
+
+        title = new JLabel(
+                "Car Management"
+        );
+
+        title.setForeground(Color.white);
+
+        title.setFont(
+                new Font(
+                        "SansSerif",
+                        Font.BOLD,
+                        18
+                )
+        );
+
+        titlePanel.add(title);
+
+        // Empty right panel keeps title centred
+        JPanel rightPanel = new JPanel();
+
+        rightPanel.setBackground(Color.blue);
+
+        headerPanel.add(backPanel);
+        headerPanel.add(titlePanel);
+        headerPanel.add(rightPanel);
+
+        // Main section
+        JPanel mainPanel = new JPanel();
+
+        mainPanel.setLayout(
+                new BorderLayout()
+        );
+
+        mainPanel.setBackground(Color.white);
+
+        // Instruction
+        JPanel instructionPanel = new JPanel();
+
+        instructionPanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        10,
+                        15
+                )
+        );
+
+        instructionPanel.setBackground(Color.white);
+
+        JLabel instruction =
+                new JLabel(
+                        "Select a Car Function"
+                );
+
+        instruction.setFont(
+                new Font(
+                        "SansSerif",
+                        Font.BOLD,
+                        16
+                )
+        );
+
+        instructionPanel.add(instruction);
+
+        // Space around buttons
+        JPanel functionArea = new JPanel();
+
+        functionArea.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        20,
+                        15
+                )
+        );
+
+        functionArea.setBackground(Color.white);
+
+        JPanel buttonArea = new JPanel();
+
+        buttonArea.setLayout(
+                new GridLayout(2, 1, 10, 10)
+        );
+
+        buttonArea.setBackground(Color.white);
+
+        // First row
+        JPanel firstRow = new JPanel();
+
+        firstRow.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        15,
+                        10
+                )
+        );
+
+        firstRow.setBackground(Color.white);
+
+        addCar = new JButton("Add Car");
+        viewCars = new JButton("View Cars");
+        searchCar = new JButton("Search Car");
+
+        // Second row
+        JPanel secondRow = new JPanel();
+
+        secondRow.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        15,
+                        10
+                )
+        );
+
+        secondRow.setBackground(Color.white);
+
+        updateCar = new JButton("Update Car");
+        deleteCar = new JButton("Delete Car");
+
+        Font buttonFont = new Font(
+                "SansSerif",
+                Font.BOLD,
+                14
+        );
+
+        addCar.setFont(buttonFont);
+        viewCars.setFont(buttonFont);
+        searchCar.setFont(buttonFont);
+        updateCar.setFont(buttonFont);
+        deleteCar.setFont(buttonFont);
+
+        addCar.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        viewCars.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        searchCar.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        updateCar.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        deleteCar.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        firstRow.add(addCar);
+        firstRow.add(viewCars);
+        firstRow.add(searchCar);
+
+        secondRow.add(updateCar);
+        secondRow.add(deleteCar);
+
+        buttonArea.add(firstRow);
+        buttonArea.add(secondRow);
+
+        functionArea.add(buttonArea);
+
+        mainPanel.add(
+                "North",
+                instructionPanel
+        );
+
+        mainPanel.add(
+                "Center",
+                functionArea
+        );
+
+        // Footer
+        JPanel footerPanel = new JPanel();
+
+        footerPanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        10,
+                        10
+                )
+        );
+
+        footerPanel.setBackground(Color.white);
+
+        JLabel footer = new JLabel(
+                "Automative Service Centre Management System"
+        );
+
+        footerPanel.add(footer);
+
+        // Button listeners
+        addCar.addActionListener(this);
+        viewCars.addActionListener(this);
+        searchCar.addActionListener(this);
+        updateCar.addActionListener(this);
+        deleteCar.addActionListener(this);
+        back.addActionListener(this);
+
+        // Add all sections
+        x.add("North", headerPanel);
+        x.add("Center", mainPanel);
+        x.add("South", footerPanel);
+
+        x.setVisible(true);
     }
 }

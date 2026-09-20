@@ -1,8 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package apu_asc.model;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import apu_asc.utility.DataIO;
@@ -775,6 +772,7 @@ public class CounterStaff extends Staff {
             String name,
             String phoneNumber,
             int age,
+            String identityNumber,
             String email,
             String address) {
 
@@ -782,7 +780,8 @@ public class CounterStaff extends Staff {
                 DataIO.checkUserID(getUserID());
 
         if (savedCounterStaff == null) {
-            System.out.println("Failed: Counter Staff account does not exist.");
+            System.out.println(
+                    "Failed: Counter Staff account does not exist.");
             return null;
         }
 
@@ -796,28 +795,34 @@ public class CounterStaff extends Staff {
                 && !staffWithSameUsername.getUserID()
                         .equalsIgnoreCase(getUserID())) {
 
-            System.out.println("Failed: Username is already used by another staff member.");
+            System.out.println(
+                    "Failed: Username is already used by another staff member.");
             return null;
         }
 
         if (customerWithSameUsername != null) {
-            System.out.println("Failed: Username is already used by a customer.");
+            System.out.println(
+                    "Failed: Username is already used by a customer.");
             return null;
         }
 
+        // Update the object stored inside DataIO
         savedCounterStaff.setUsername(username);
         savedCounterStaff.setPassword(password);
         savedCounterStaff.setName(name);
         savedCounterStaff.setPhoneNumber(phoneNumber);
         savedCounterStaff.setAge(age);
+        savedCounterStaff.setIdentityNumber(identityNumber);
         savedCounterStaff.setEmail(email);
         savedCounterStaff.setAddress(address);
 
+        // Update the currently logged-in object
         setUsername(username);
         setPassword(password);
         setName(name);
         setPhoneNumber(phoneNumber);
         setAge(age);
+        setIdentityNumber(identityNumber);
         setEmail(email);
         setAddress(address);
 

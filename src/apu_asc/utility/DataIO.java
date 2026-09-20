@@ -126,7 +126,9 @@ public class DataIO {
     
     private static void readUsers(){
         try{
-            Scanner scanner = new Scanner(new File(USER_FILE));
+            File userFile = new File(USER_FILE);
+
+            Scanner scanner = new Scanner(userFile);
             
             while(scanner.hasNextLine()){
                 
@@ -194,8 +196,9 @@ public class DataIO {
             
             scanner.close();
             
-        }catch(Exception ex){
-            System.out.println("Error in reading users.txt ");
+        } catch (Exception ex) {
+            System.out.println("Error in reading users.txt");
+            ex.printStackTrace();
         }
     }
     
@@ -227,6 +230,7 @@ public class DataIO {
         } catch (Exception ex) {
 
             System.out.println("Error in writing staff.txt");
+            ex.printStackTrace();
         }
     }
 

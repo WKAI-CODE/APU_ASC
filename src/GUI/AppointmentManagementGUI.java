@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package GUI;
 
 import apu_asc.model.CounterStaff;
@@ -11,14 +7,23 @@ import apu_asc.model.Customer;
 import apu_asc.model.Staff;
 import apu_asc.utility.DataIO;
 
-import java.awt.Button;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Label;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.GridLayout;
 
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class AppointmentManagementGUI
         implements ActionListener {
@@ -27,54 +32,12 @@ public class AppointmentManagementGUI
 
     JFrame x;
 
-    Label title;
+    JLabel title;
 
-    Button bookAppointment;
-    Button viewAppointments;
-    Button searchAppointment;
-    Button back;
-
-    public AppointmentManagementGUI(
-            CounterStaff counterStaff) {
-
-        this.counterStaff = counterStaff;
-
-        x = new JFrame();
-
-        x.setTitle("Appointment Management");
-        x.setSize(500, 200);
-        x.setLocation(550, 300);
-        x.setLayout(new FlowLayout());
-
-        title = new Label(
-                "Appointment Management",
-                Label.CENTER
-        );
-
-        bookAppointment =
-                new Button("Book Appointment");
-
-        viewAppointments =
-                new Button("View Appointments");
-
-        searchAppointment =
-                new Button("Search Appointment");
-
-        back = new Button("Back");
-
-        bookAppointment.addActionListener(this);
-        viewAppointments.addActionListener(this);
-        searchAppointment.addActionListener(this);
-        back.addActionListener(this);
-
-        x.add(title);
-        x.add(bookAppointment);
-        x.add(viewAppointments);
-        x.add(searchAppointment);
-        x.add(back);
-
-        x.setVisible(true);
-    }
+    JButton bookAppointment;
+    JButton viewAppointments;
+    JButton searchAppointment;
+    JButton back;
 
     public void actionPerformed(ActionEvent e) {
 
@@ -82,7 +45,7 @@ public class AppointmentManagementGUI
 
             try {
 
-                // Search Customer
+                // Search for Customer
                 String customerKeyword =
                         JOptionPane.showInputDialog(
                                 x,
@@ -90,14 +53,21 @@ public class AppointmentManagementGUI
                                 + "name or phone number:"
                         );
 
-                if (customerKeyword == null
-                        || customerKeyword.trim().isEmpty()) {
-
-                    throw new Exception();
+                if (customerKeyword == null) {
+                    return;
                 }
 
-                customerKeyword =
-                        customerKeyword.trim();
+                customerKeyword = customerKeyword.trim();
+
+                if (customerKeyword.isEmpty()) {
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Please enter a search keyword!"
+                    );
+
+                    return;
+                }
 
                 String customerResults = "";
                 int customerMatches = 0;
@@ -111,9 +81,7 @@ public class AppointmentManagementGUI
                             DataIO.allCustomers.get(i);
 
                     if (customer.getUserID()
-                                .equalsIgnoreCase(
-                                        customerKeyword
-                                )
+                                .equalsIgnoreCase(customerKeyword)
                             || customer.getUsername()
                                 .toLowerCase()
                                 .contains(
@@ -168,17 +136,26 @@ public class AppointmentManagementGUI
                                     + "you want to select:"
                             );
 
-                    if (selectedCustomerID == null
-                            || selectedCustomerID
-                                    .trim()
-                                    .isEmpty()) {
+                    if (selectedCustomerID == null) {
+                        return;
+                    }
 
-                        throw new Exception();
+                    selectedCustomerID =
+                            selectedCustomerID.trim();
+
+                    if (selectedCustomerID.isEmpty()) {
+
+                        JOptionPane.showMessageDialog(
+                                x,
+                                "Please enter a Customer ID!"
+                        );
+
+                        return;
                     }
 
                     selectedCustomer =
                             DataIO.checkCustomerID(
-                                    selectedCustomerID.trim()
+                                    selectedCustomerID
                             );
 
                     if (selectedCustomer == null) {
@@ -204,8 +181,7 @@ public class AppointmentManagementGUI
                         i < DataIO.allCars.size();
                         i++) {
 
-                    Car car =
-                            DataIO.allCars.get(i);
+                    Car car = DataIO.allCars.get(i);
 
                     if (car.getCustomerID()
                             .equalsIgnoreCase(customerID)) {
@@ -216,7 +192,7 @@ public class AppointmentManagementGUI
                         carResults +=
                                 "Car ID: "
                                 + car.getCarID()
-                                + "\nRegistration number: "
+                                + "\nRegistration Number: "
                                 + car.getRegistrationNumber()
                                 + "\nBrand: "
                                 + car.getBrand()
@@ -228,7 +204,11 @@ public class AppointmentManagementGUI
 
                 if (carMatches == 0) {
 
-                    JOptionPane.showMessageDialog(x,"This Customer does not have a registered car." + "\nPlease register the car first."
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "This Customer does not have "
+                            + "a registered car."
+                            + "\nPlease register the car first."
                     );
 
                     return;
@@ -249,16 +229,24 @@ public class AppointmentManagementGUI
                                     + "you want to select:"
                             );
 
-                    if (selectedCarID == null
-                            || selectedCarID.trim().isEmpty()) {
+                    if (selectedCarID == null) {
+                        return;
+                    }
 
-                        throw new Exception();
+                    selectedCarID = selectedCarID.trim();
+
+                    if (selectedCarID.isEmpty()) {
+
+                        JOptionPane.showMessageDialog(
+                                x,
+                                "Please enter a Car ID!"
+                        );
+
+                        return;
                     }
 
                     selectedCar =
-                            DataIO.checkCarID(
-                                    selectedCarID.trim()
-                            );
+                            DataIO.checkCarID(selectedCarID);
 
                     if (selectedCar == null
                             || !selectedCar.getCustomerID()
@@ -266,59 +254,144 @@ public class AppointmentManagementGUI
 
                         JOptionPane.showMessageDialog(
                                 x,
-                                "The selected car does not belong "
-                                + "to this Customer!"
+                                "The selected car does not "
+                                + "belong to this Customer!"
                         );
 
                         return;
                     }
                 }
 
-                String carID =
-                        selectedCar.getCarID();
+                String carID = selectedCar.getCarID();
 
-                JOptionPane.showMessageDialog(
-                        x,
-                        "Selected Customer and Car"
-                        + "\n\nCustomer ID: "
-                        + selectedCustomer.getUserID()
-                        + "\nCustomer name: "
-                        + selectedCustomer.getName()
-                        + "\nCar ID: "
-                        + selectedCar.getCarID()
-                        + "\nRegistration number: "
-                        + selectedCar.getRegistrationNumber()
-                        + "\nCar: "
-                        + selectedCar.getBrand()
-                        + " "
-                        + selectedCar.getModel()
-                );
-
-                // Select service type
-                String serviceType =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter service type:"
-                                + "\nMINOR = 1 hour"
-                                + "\nMAJOR = 3 hours"
+                // Read-only Customer and Car fields
+                JTextField customerIDField =
+                        new JTextField(
+                                selectedCustomer.getUserID()
                         );
 
-                if (serviceType == null
-                        || serviceType.trim().isEmpty()) {
+                JTextField customerNameField =
+                        new JTextField(
+                                selectedCustomer.getName()
+                        );
 
-                    throw new Exception();
+                JTextField carIDField =
+                        new JTextField(
+                                selectedCar.getCarID()
+                        );
+
+                JTextField registrationNumberField =
+                        new JTextField(
+                                selectedCar.getRegistrationNumber()
+                        );
+
+                JTextField carDescriptionField =
+                        new JTextField(
+                                selectedCar.getBrand()
+                                + " "
+                                + selectedCar.getModel()
+                        );
+
+                customerIDField.setEditable(false);
+                customerNameField.setEditable(false);
+                carIDField.setEditable(false);
+                registrationNumberField.setEditable(false);
+                carDescriptionField.setEditable(false);
+
+                // Service dropdown
+                String[] serviceOptions = {
+                    "MINOR - 1 hour",
+                    "MAJOR - 3 hours"
+                };
+
+                JComboBox<String> serviceTypeBox =
+                        new JComboBox<>(serviceOptions);
+
+                JTextField dateField =
+                        new JTextField(15);
+
+                JTextField startTimeField =
+                        new JTextField(15);
+
+                JPanel appointmentPanel =
+                        new JPanel(
+                                new GridLayout(8, 2, 10, 10)
+                        );
+
+                appointmentPanel.add(
+                        new JLabel("Customer ID:")
+                );
+                appointmentPanel.add(customerIDField);
+
+                appointmentPanel.add(
+                        new JLabel("Customer Name:")
+                );
+                appointmentPanel.add(customerNameField);
+
+                appointmentPanel.add(
+                        new JLabel("Car ID:")
+                );
+                appointmentPanel.add(carIDField);
+
+                appointmentPanel.add(
+                        new JLabel("Registration Number:")
+                );
+                appointmentPanel.add(
+                        registrationNumberField
+                );
+
+                appointmentPanel.add(
+                        new JLabel("Car:")
+                );
+                appointmentPanel.add(carDescriptionField);
+
+                appointmentPanel.add(
+                        new JLabel("Service Type:")
+                );
+                appointmentPanel.add(serviceTypeBox);
+
+                appointmentPanel.add(
+                        new JLabel("Date (yyyy-MM-dd):")
+                );
+                appointmentPanel.add(dateField);
+
+                appointmentPanel.add(
+                        new JLabel("Start Time (HH:mm):")
+                );
+                appointmentPanel.add(startTimeField);
+
+                int result = JOptionPane.showConfirmDialog(
+                        x,
+                        appointmentPanel,
+                        "Book Appointment",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE
+                );
+
+                if (result != JOptionPane.OK_OPTION) {
+                    return;
                 }
 
-                serviceType =
-                        serviceType.trim().toUpperCase();
+                String serviceType;
 
-                if (!serviceType.equals("MINOR")
-                        && !serviceType.equals("MAJOR")) {
+                if (serviceTypeBox.getSelectedIndex() == 0) {
+                    serviceType = "MINOR";
+                } else {
+                    serviceType = "MAJOR";
+                }
+
+                String date =
+                        dateField.getText().trim();
+
+                String startTime =
+                        startTimeField.getText().trim();
+
+                if (date.isEmpty()
+                        || startTime.isEmpty()) {
 
                     JOptionPane.showMessageDialog(
                             x,
-                            "Service type must be "
-                            + "MINOR or MAJOR!"
+                            "Please complete all fields!"
                     );
 
                     return;
@@ -327,11 +400,8 @@ public class AppointmentManagementGUI
                 double servicePrice;
 
                 if (serviceType.equals("MINOR")) {
-
                     servicePrice = DataIO.minorPrice;
-
                 } else {
-
                     servicePrice = DataIO.majorPrice;
                 }
 
@@ -346,26 +416,8 @@ public class AppointmentManagementGUI
                     return;
                 }
 
-                // Enter booking date
-                String date =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter appointment date:"
-                                + "\nFormat: yyyy-MM-dd"
-                                + "\nBooking is allowed from tomorrow "
-                                + "until the next 14 days."
-                        );
-
-                if (date == null
-                        || date.trim().isEmpty()) {
-
-                    throw new Exception();
-                }
-
-                date = date.trim();
-
-                if (counterStaff.getValidBookingDate(
-                        date) == null) {
+                if (counterStaff.getValidBookingDate(date)
+                        == null) {
 
                     JOptionPane.showMessageDialog(
                             x,
@@ -376,23 +428,6 @@ public class AppointmentManagementGUI
 
                     return;
                 }
-
-                // Enter start time
-                String startTime =
-                        JOptionPane.showInputDialog(
-                                x,
-                                "Enter the start time:"
-                                + "\nFormat: HH:mm"
-                                + "\nWorking hours: 09:00 to 18:00"
-                        );
-
-                if (startTime == null
-                        || startTime.trim().isEmpty()) {
-
-                    throw new Exception();
-                }
-
-                startTime = startTime.trim();
 
                 String endTime =
                         counterStaff.calculateEndTime(
@@ -430,13 +465,13 @@ public class AppointmentManagementGUI
                 JOptionPane.showMessageDialog(
                         x,
                         "Appointment Time"
-                        + "\n\nService type: "
+                        + "\n\nService Type: "
                         + serviceType
-                        + "\nStart time: "
+                        + "\nStart Time: "
                         + startTime
-                        + "\nEnd time: "
+                        + "\nEnd Time: "
                         + endTime
-                        + "\nService price: RM "
+                        + "\nService Price: RM "
                         + String.format(
                                 "%.2f",
                                 servicePrice
@@ -508,17 +543,26 @@ public class AppointmentManagementGUI
                                     + "you want to assign:"
                             );
 
-                    if (selectedTechnicianID == null
-                            || selectedTechnicianID
-                                    .trim()
-                                    .isEmpty()) {
+                    if (selectedTechnicianID == null) {
+                        return;
+                    }
 
-                        throw new Exception();
+                    selectedTechnicianID =
+                            selectedTechnicianID.trim();
+
+                    if (selectedTechnicianID.isEmpty()) {
+
+                        JOptionPane.showMessageDialog(
+                                x,
+                                "Please enter a Technician ID!"
+                        );
+
+                        return;
                     }
 
                     selectedTechnician =
                             DataIO.checkUserID(
-                                    selectedTechnicianID.trim()
+                                    selectedTechnicianID
                             );
 
                     if (selectedTechnician == null
@@ -590,21 +634,27 @@ public class AppointmentManagementGUI
                             x,
                             "Appointment created successfully!"
                             + "\n\nAppointment ID: "
-                            + newAppointment.getAppointmentID()
+                            + newAppointment
+                                    .getAppointmentID()
                             + "\nCustomer ID: "
-                            + newAppointment.getCustomerID()
+                            + newAppointment
+                                    .getCustomerID()
                             + "\nCar ID: "
                             + newAppointment.getCarID()
                             + "\nTechnician ID: "
-                            + newAppointment.getTechnicianID()
-                            + "\nService type: "
-                            + newAppointment.getServiceType()
+                            + newAppointment
+                                    .getTechnicianID()
+                            + "\nService Type: "
+                            + newAppointment
+                                    .getServiceType()
                             + "\nDate: "
                             + newAppointment.getDate()
                             + "\nTime: "
-                            + newAppointment.getStartTime()
+                            + newAppointment
+                                    .getStartTime()
                             + " - "
-                            + newAppointment.getEndTime()
+                            + newAppointment
+                                    .getEndTime()
                             + "\nPrice: RM "
                             + String.format(
                                     "%.2f",
@@ -624,10 +674,10 @@ public class AppointmentManagementGUI
 
                 JOptionPane.showMessageDialog(
                         x,
-                        "Invalid input!"
+                        "Unable to create the appointment!"
                 );
             }
-            
+
         } else if (e.getSource() == viewAppointments) {
 
             if (DataIO.allAppointments.isEmpty()) {
@@ -719,12 +769,12 @@ public class AppointmentManagementGUI
                             + "\n------------------------------\n";
                 }
 
-                JOptionPane.showMessageDialog(
-                        x,
+                showScrollableResults(
+                        "Appointment Records",
                         appointmentDetails
                 );
             }
-            
+
         } else if (e.getSource() == searchAppointment) {
 
             try {
@@ -860,10 +910,9 @@ public class AppointmentManagementGUI
 
                 } else {
 
-                    JOptionPane.showMessageDialog(
-                            x,
-                            "Matching Appointments:\n\n"
-                            + searchResults
+                    showScrollableResults(
+                            "Matching Appointments",
+                            searchResults
                     );
                 }
 
@@ -883,5 +932,272 @@ public class AppointmentManagementGUI
 
             x.setVisible(false);
         }
+    }
+
+    private void showScrollableResults(
+            String windowTitle,
+            String results) {
+
+        JTextArea resultArea = new JTextArea(
+                results,
+                18,
+                45
+        );
+
+        resultArea.setEditable(false);
+        resultArea.setLineWrap(true);
+        resultArea.setWrapStyleWord(true);
+        resultArea.setCaretPosition(0);
+
+        JScrollPane scrollPane = new JScrollPane(
+                resultArea
+        );
+
+        JOptionPane.showMessageDialog(
+                x,
+                scrollPane,
+                windowTitle,
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    public AppointmentManagementGUI(
+            CounterStaff counterStaff) {
+
+        this.counterStaff = counterStaff;
+
+        x = new JFrame();
+
+        x.setTitle("Appointment Management");
+        x.setSize(650, 350);
+        x.setLocation(430, 220);
+
+        x.setLayout(
+                new BorderLayout(10, 10)
+        );
+
+        // Header section
+        JPanel headerPanel = new JPanel();
+
+        headerPanel.setLayout(
+                new GridLayout(1, 3)
+        );
+
+        headerPanel.setBackground(Color.blue);
+
+        // Back button on the left
+        JPanel backPanel = new JPanel();
+
+        backPanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.LEFT,
+                        15,
+                        10
+                )
+        );
+
+        backPanel.setBackground(Color.blue);
+
+        back = new JButton("   Back   ");
+
+        back.setFont(
+                new Font(
+                        "SansSerif",
+                        Font.BOLD,
+                        14
+                )
+        );
+
+        backPanel.add(back);
+
+        // Title in the centre
+        JPanel titlePanel = new JPanel();
+
+        titlePanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        10,
+                        15
+                )
+        );
+
+        titlePanel.setBackground(Color.blue);
+
+        title = new JLabel(
+                "Appointment Management"
+        );
+
+        title.setForeground(Color.white);
+
+        title.setFont(
+                new Font(
+                        "SansSerif",
+                        Font.BOLD,
+                        16
+                )
+        );
+
+        titlePanel.add(title);
+
+        // Empty right panel keeps title centred
+        JPanel rightPanel = new JPanel();
+
+        rightPanel.setBackground(Color.blue);
+
+        headerPanel.add(backPanel);
+        headerPanel.add(titlePanel);
+        headerPanel.add(rightPanel);
+
+        // Main section
+        JPanel mainPanel = new JPanel();
+
+        mainPanel.setLayout(
+                new BorderLayout()
+        );
+
+        mainPanel.setBackground(Color.white);
+
+        // Instruction
+        JPanel instructionPanel = new JPanel();
+
+        instructionPanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        10,
+                        15
+                )
+        );
+
+        instructionPanel.setBackground(Color.white);
+
+        JLabel instruction =
+                new JLabel(
+                        "Select an Appointment Function"
+                );
+
+        instruction.setFont(
+                new Font(
+                        "SansSerif",
+                        Font.BOLD,
+                        16
+                )
+        );
+
+        instructionPanel.add(instruction);
+
+        // Space around buttons
+        JPanel functionArea = new JPanel();
+
+        functionArea.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        20,
+                        15
+                )
+        );
+
+        functionArea.setBackground(Color.white);
+
+        JPanel buttonArea = new JPanel();
+
+        buttonArea.setLayout(
+                new GridLayout(1, 1, 10, 10)
+        );
+
+        buttonArea.setBackground(Color.white);
+
+        // Function button row
+        JPanel firstRow = new JPanel();
+
+        firstRow.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        15,
+                        10
+                )
+        );
+
+        firstRow.setBackground(Color.white);
+
+        bookAppointment =
+                new JButton("Book Appointment");
+
+        viewAppointments =
+                new JButton("View Appointments");
+
+        searchAppointment =
+                new JButton("Search Appointment");
+
+        Font buttonFont = new Font(
+                "SansSerif",
+                Font.BOLD,
+                14
+        );
+
+        bookAppointment.setFont(buttonFont);
+        viewAppointments.setFont(buttonFont);
+        searchAppointment.setFont(buttonFont);
+
+        bookAppointment.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        viewAppointments.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        searchAppointment.setVerticalAlignment(
+                JButton.CENTER
+        );
+
+        firstRow.add(bookAppointment);
+        firstRow.add(viewAppointments);
+        firstRow.add(searchAppointment);
+
+        buttonArea.add(firstRow);
+
+        functionArea.add(buttonArea);
+
+        mainPanel.add(
+                "North",
+                instructionPanel
+        );
+
+        mainPanel.add(
+                "Center",
+                functionArea
+        );
+
+        // Footer
+        JPanel footerPanel = new JPanel();
+
+        footerPanel.setLayout(
+                new FlowLayout(
+                        FlowLayout.CENTER,
+                        10,
+                        10
+                )
+        );
+
+        footerPanel.setBackground(Color.white);
+
+        JLabel footer = new JLabel(
+                "Automative Service Centre Management System"
+        );
+
+        footerPanel.add(footer);
+
+        // Button listeners
+        bookAppointment.addActionListener(this);
+        viewAppointments.addActionListener(this);
+        searchAppointment.addActionListener(this);
+        back.addActionListener(this);
+
+        // Add all sections
+        x.add("North", headerPanel);
+        x.add("Center", mainPanel);
+        x.add("South", footerPanel);
+
+        x.setVisible(true);
     }
 }

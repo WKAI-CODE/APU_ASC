@@ -13,12 +13,15 @@ public class LoginGUI extends JFrame implements ActionListener{
 
     private JTextField usernameField;
     private JPasswordField passwordField;
+    private JCheckBox showPasswordCheckBox;
     
     private JButton loginButton;
     private JButton exitButton;
     public LoginGUI() {
         
-        setTitle("Automotive Service Centre");
+        DataIO.read();
+
+        setTitle("Automative Service Centre");
         setSize(450,500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -97,13 +100,22 @@ public class LoginGUI extends JFrame implements ActionListener{
 
         panel.add(passwordField, gbc);
         
+        showPasswordCheckBox = new JCheckBox("Show Password");
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        
+        panel.add(showPasswordCheckBox, gbc);
+        
         //LOG IN BUTTON
         loginButton = new JButton("Login");
         loginButton.setPreferredSize(new Dimension(200, 40));
         
         loginButton.setFont( new Font("Arial", Font.BOLD, 14) ); 
         gbc.gridx = 0; 
-        gbc.gridy = 6; 
+        gbc.gridy = 7; 
         gbc.gridwidth = 2; 
         gbc.anchor = GridBagConstraints.CENTER; 
         gbc.fill = GridBagConstraints.NONE; 
@@ -115,7 +127,7 @@ public class LoginGUI extends JFrame implements ActionListener{
         exitButton = new JButton("Exit");
         exitButton.setFont( new Font("Arial", Font.PLAIN, 13) ); 
         gbc.gridx = 0; 
-        gbc.gridy = 7; 
+        gbc.gridy = 8; 
         gbc.gridwidth = 2; 
         gbc.insets = new Insets(0, 20, 20, 20); 
         panel.add(exitButton, gbc);
@@ -124,6 +136,7 @@ public class LoginGUI extends JFrame implements ActionListener{
         //BUTTON LISTENER
         loginButton.addActionListener(this);
         exitButton.addActionListener(this);
+        showPasswordCheckBox.addActionListener(this);
         
         
         add(panel);
@@ -134,7 +147,16 @@ public class LoginGUI extends JFrame implements ActionListener{
     
     //BUTTON ACTION
     public void actionPerformed(ActionEvent e){
-        if(e.getSource() == loginButton){
+        
+        if (e.getSource() == showPasswordCheckBox) {
+
+            if (showPasswordCheckBox.isSelected()) {
+                passwordField.setEchoChar((char) 0);
+            } else {
+                passwordField.setEchoChar('*');
+            }
+
+        } else if (e.getSource() == loginButton) {
             String username = usernameField.getText().trim();
             
             String password = new String(passwordField.getPassword());
@@ -153,7 +175,7 @@ public class LoginGUI extends JFrame implements ActionListener{
             
             //USERNAME NOT FOUND
             if(staff == null){
-                JOptionPane.showMessageDialog(this,"Invalid username or password.");
+                JOptionPane.showMessageDialog(this, "Username not found.");
                 
                 return;
             }
@@ -161,7 +183,7 @@ public class LoginGUI extends JFrame implements ActionListener{
             //CHECK PASSWORD
             if(!staff.getPassword().equals(password)){
                 
-                JOptionPane.showMessageDialog(this,"Invalid username or password.");
+                JOptionPane.showMessageDialog(this,"Password is incorrect.");
                 
                 return;
                 
@@ -173,7 +195,7 @@ public class LoginGUI extends JFrame implements ActionListener{
             
             //OPEN GUI BASED ON ROLE
             if(staff.getRole().equals("Manager")){
-                new ManagerGUI(staff);
+                JOptionPane.showMessageDialog(this, "Manager GUI is not ready yet.");
                 
             }else if (staff.getRole().equalsIgnoreCase("CounterStaff")){
                 
@@ -182,7 +204,7 @@ public class LoginGUI extends JFrame implements ActionListener{
                     
             } else if (staff.getRole().equals("Technician")) {
 
-                new TechnicianGUI(staff);
+                JOptionPane.showMessageDialog(this, "Technician GUI is not ready yet.");
             }
             
             dispose();
@@ -192,5 +214,9 @@ public class LoginGUI extends JFrame implements ActionListener{
         else if(e.getSource() == exitButton){
             System.exit(0);
         }
+    }
+    
+    public static void main(String[] args) {
+        new LoginGUI();
     }
 }

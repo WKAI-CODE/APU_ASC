@@ -1,3 +1,3 @@
 serviceType|durationHours|price
-MINOR|1|50.00
-MAJOR|3|150.00
+MINOR|1|80.0
+MAJOR|3|250.0
