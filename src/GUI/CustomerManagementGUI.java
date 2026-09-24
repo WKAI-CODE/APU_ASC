@@ -3,6 +3,7 @@ package GUI;
 import apu_asc.model.CounterStaff;
 import apu_asc.model.Customer;
 import apu_asc.utility.DataIO;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -10,6 +11,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -95,6 +97,15 @@ public class CustomerManagementGUI
                     JOptionPane.showMessageDialog(
                             x,
                             "Please complete all fields!"
+                    );
+
+                } else if (!phoneNumber.matches(
+                        "^(01)[0-9]{8,9}$")) {
+
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Invalid phone number.\n"
+                            + "Example: 0123456789"
                     );
 
                 } else {
@@ -399,6 +410,15 @@ public class CustomerManagementGUI
                         JOptionPane.showMessageDialog(
                                 x,
                                 "Please complete all fields!"
+                        );
+
+                    } else if (!newPhoneNumber.matches(
+                            "^(01)[0-9]{8,9}$")) {
+
+                        JOptionPane.showMessageDialog(
+                                x,
+                                "Invalid phone number.\n"
+                                + "Example: 0123456789"
                         );
 
                     } else {

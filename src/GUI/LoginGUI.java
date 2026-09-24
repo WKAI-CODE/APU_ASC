@@ -195,7 +195,8 @@ public class LoginGUI extends JFrame implements ActionListener{
             
             //OPEN GUI BASED ON ROLE
             if(staff.getRole().equals("Manager")){
-                JOptionPane.showMessageDialog(this, "Manager GUI is not ready yet.");
+                new ManagerGUI(staff);
+                this.dispose();
                 
             }else if (staff.getRole().equalsIgnoreCase("CounterStaff")){
                 

@@ -37,7 +37,7 @@ public class EditCSProfileGUI implements ActionListener {
                     + "\nName: " + counterStaff.getName()
                     + "\nPhone number: " + counterStaff.getPhoneNumber()
                     + "\nAge: " + counterStaff.getAge()
-                    + "\nIC/Passport number: " + counterStaff.getIdentityNumber()
+                    + "\nIdentity number: " + counterStaff.getIdentityNumber()
                     + "\nEmail: " + counterStaff.getEmail()
                     + "\nAddress: " + counterStaff.getAddress()
                     + "\nRole: " + counterStaff.getRole();
@@ -132,7 +132,7 @@ public class EditCSProfileGUI implements ActionListener {
             editProfilePanel.add(ageField);
 
             editProfilePanel.add(
-                    new JLabel("IC/Passport Number:")
+                    new JLabel("Identity Number:")
             );
             editProfilePanel.add(identityNumberField);
 
@@ -194,6 +194,44 @@ public class EditCSProfileGUI implements ActionListener {
                 JOptionPane.showMessageDialog(
                         x,
                         "All fields must be completed!"
+                );
+
+                return;
+            }
+            
+            // Phone number validation
+            if (!phoneNumber.matches(
+                    "^(01)[0-9]{8,9}$")) {
+
+                JOptionPane.showMessageDialog(
+                        x,
+                        "Invalid phone number.\n"
+                        + "Example: 0123456789"
+                );
+
+                return;
+            }
+
+            // Identity number validation
+            if (!identityNumber.matches(
+                    "^[0-9]{6}-[0-9]{2}-[0-9]{4}$")) {
+
+                JOptionPane.showMessageDialog(
+                        x,
+                        "Invalid identity number.\n"
+                        + "Example: 010101-01-1234"
+                );
+
+                return;
+            }
+
+            // Email validation
+            if (!email.matches(
+                    "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+                JOptionPane.showMessageDialog(
+                        x,
+                        "Invalid email format."
                 );
 
                 return;

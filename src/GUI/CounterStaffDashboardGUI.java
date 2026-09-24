@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class CounterStaffDashboardGUI
@@ -67,11 +68,21 @@ public class CounterStaffDashboardGUI
             x.setVisible(false);
 
         } else if (e.getSource() == logout) {
+            
+            int choice = JOptionPane.showConfirmDialog(x,
+                    "Are you sure you want to logout?",
+                    "Logout",
+                    JOptionPane.YES_NO_OPTION
+            );
+            
+            if(choice == JOptionPane.YES_OPTION){
+                
 
             LoginGUI loginPage = new LoginGUI();
 
             loginPage.setVisible(true);
             x.setVisible(false);
+            }
         }
     }
 
