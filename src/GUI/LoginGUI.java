@@ -18,7 +18,7 @@ public class LoginGUI extends JFrame implements ActionListener{
     private JButton loginButton;
     private JButton exitButton;
     public LoginGUI() {
-        
+          
         DataIO.read();
 
         setTitle("Automative Service Centre");
