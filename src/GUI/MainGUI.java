@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class LoginGUI extends JFrame implements ActionListener{
+public class MainGUI extends JFrame implements ActionListener{
 
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -17,7 +17,7 @@ public class LoginGUI extends JFrame implements ActionListener{
     
     private JButton loginButton;
     private JButton exitButton;
-    public LoginGUI() {
+    public MainGUI() {
           
         DataIO.read();
 
@@ -218,6 +218,6 @@ public class LoginGUI extends JFrame implements ActionListener{
     }
     
     public static void main(String[] args) {
-        new LoginGUI();
+        new MainGUI();
     }
 }

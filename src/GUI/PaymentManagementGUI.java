@@ -38,6 +38,7 @@ public class PaymentManagementGUI
     JButton viewReceipts;
     JButton back;
     
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == collectPayment) {
@@ -219,29 +220,30 @@ public class PaymentManagementGUI
                     return;
                 }
 
-                String confirmation =
-                        JOptionPane.showInputDialog(
+                String paymentDetails =
+                        "Appointment ID: "
+                        + selectedAppointment.getAppointmentID()
+                        + "\nCustomer: "
+                        + customerName
+                        + "\nAmount: RM "
+                        + String.format(
+                                "%.2f",
+                                selectedAppointment.getServicePrice()
+                        )
+                        + "\nPayment method: "
+                        + paymentMethod
+                        + "\n\nDo you want to confirm this payment?";
+
+                int confirmation =
+                        JOptionPane.showConfirmDialog(
                                 x,
-                                "Confirm Payment"
-                                + "\n\nAppointment ID: "
-                                + selectedAppointment
-                                        .getAppointmentID()
-                                + "\nCustomer: "
-                                + customerName
-                                + "\nAmount: RM "
-                                + String.format(
-                                        "%.2f",
-                                        selectedAppointment
-                                                .getServicePrice()
-                                )
-                                + "\nPayment method: "
-                                + paymentMethod
-                                + "\n\nType YES to confirm:"
+                                paymentDetails,
+                                "Confirm Payment",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE
                         );
 
-                if (confirmation == null
-                        || !confirmation
-                                .equalsIgnoreCase("YES")) {
+                if (confirmation != JOptionPane.YES_OPTION) {
 
                     JOptionPane.showMessageDialog(
                             x,

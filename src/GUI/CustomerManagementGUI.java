@@ -36,7 +36,8 @@ public class CustomerManagementGUI
     JButton updateCustomer;
     JButton deleteCustomer;
     JButton back;
-
+    
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == addCustomer) {
@@ -102,11 +103,7 @@ public class CustomerManagementGUI
                 } else if (!phoneNumber.matches(
                         "^(01)[0-9]{8,9}$")) {
 
-                    JOptionPane.showMessageDialog(
-                            x,
-                            "Invalid phone number.\n"
-                            + "Example: 0123456789"
-                    );
+                    JOptionPane.showMessageDialog(x, "Invalid phone number.\n" + "Example: 0123456789");
 
                 } else {
 

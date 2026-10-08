@@ -1,4 +1,4 @@
-package apu_asc.utility;
+package utility;
 
 import apu_asc.model.CounterStaff;
 import apu_asc.model.Appointment;
@@ -27,14 +27,14 @@ public class DataIO {
     private static final String CUSTOMER_COMMENT_FILE = "src/data/customer_comments.txt";
     
     //Array list
-    public static ArrayList<Staff> allStaff = new ArrayList<Staff>();
-    public static ArrayList<Customer> allCustomers = new ArrayList<Customer>();
-    public static ArrayList<Car> allCars = new ArrayList<Car>();
-    public static ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
-    public static ArrayList<Payment> allPayments = new ArrayList<Payment>();
-    public static ArrayList<Receipt> allReceipts = new ArrayList<Receipt>();
-    public static ArrayList<TechnicianFeedback> allTechnicianFeedback = new ArrayList<TechnicianFeedback>();
-    public static ArrayList<CustomerComment> allCustomerComments = new ArrayList<CustomerComment>();
+    public static ArrayList<Staff> allStaff = new ArrayList<>();
+    public static ArrayList<Customer> allCustomers = new ArrayList<>();
+    public static ArrayList<Car> allCars = new ArrayList<>();
+    public static ArrayList<Appointment> allAppointments = new ArrayList<>();
+    public static ArrayList<Payment> allPayments = new ArrayList<>();
+    public static ArrayList<Receipt> allReceipts = new ArrayList<>();
+    public static ArrayList<TechnicianFeedback> allTechnicianFeedback = new ArrayList<>();
+    public static ArrayList<CustomerComment> allCustomerComments = new ArrayList<>();
     
     
     public static double minorPrice = 0.0;

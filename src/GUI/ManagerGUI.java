@@ -347,231 +347,314 @@ public class ManagerGUI extends JFrame implements ActionListener {
         
         //ADD STAFF
         private void addStaff(){
-            
-            while(true){
-                String[] roles = {
-                    "Manager",
-                    "CounterStaff",
-                    "Technician"
-                
-                };
-                
-                String role = 
-                            (String) JOptionPane.showInputDialog(
-                            this,
-                            "Select Staff Role:",
-                            "Add Staff",
-                            JOptionPane.QUESTION_MESSAGE,
-                            null,
-                            roles,
-                            roles[0]);
-                
-                if (role == null){
+
+            String[] roles = {
+                "Manager",
+                "CounterStaff",
+                "Technician"
+            };
+
+            String role = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Select Staff Role:",
+                    "Add Staff",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    roles,
+                    roles[0]
+            );
+
+            if (role == null) {
+                return;
+            }
+
+            // Name
+            String name;
+
+            while (true) {
+                name = JOptionPane.showInputDialog(this, "Enter Name:");
+
+                if (name == null) {
                     return;
                 }
-                
-                String name = JOptionPane.showInputDialog(this,"Enter Name:");
-                
-                if(name == null){
-                    return;
-                }
-                
-                String username =
-                    JOptionPane.showInputDialog(
+
+                name = name.trim();
+
+                if (name.isEmpty()) {
+                    JOptionPane.showMessageDialog(
                             this,
-                            "Enter Username:");
+                            "Name cannot be empty.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                break;
+            }
+
+            // Username
+            String username;
+
+            while (true) {
+                username = JOptionPane.showInputDialog(this, "Enter Username:");
 
                 if (username == null) {
                     return;
                 }
-                
-                String phoneNumber = JOptionPane.showInputDialog(this, "Enter Phone Number:");
-                
-                if(phoneNumber == null){
-                    return;              
+
+                username = username.trim();
+
+                if (username.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Username cannot be empty.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
                 }
-                
-                String ageText =
-                    JOptionPane.showInputDialog(
+
+                if (managerFunction.findUsername(username) != null) {
+                    JOptionPane.showMessageDialog(
                             this,
-                            "Enter Age:");
+                            "Username already exists. Please enter another username.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
 
-            if (ageText == null) {
-                return;
+                break;
             }
 
-            String identityNumber =
-                    JOptionPane.showInputDialog(
+            // Phone Number
+            String phoneNumber;
+
+            while (true) {
+                phoneNumber = JOptionPane.showInputDialog(
+                        this,
+                        "Enter Phone Number:"
+                );
+
+                if (phoneNumber == null) {
+                    return;
+                }
+
+                phoneNumber = phoneNumber.trim();
+
+                if (phoneNumber.isEmpty()) {
+                    JOptionPane.showMessageDialog(
                             this,
-                            "Enter Identity Number:");
+                            "Phone number cannot be empty.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
 
-            if (identityNumber == null) {
-                return;
-            }
-
-            String email =
-                    JOptionPane.showInputDialog(
+                if (!phoneNumber.matches("^(01)[0-9]{8,9}$")) {
+                    JOptionPane.showMessageDialog(
                             this,
-                            "Enter Email:");
+                            "Invalid phone number.\nExample: 0123456789",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
 
-            if (email == null) {
-                return;
+                break;
             }
 
-            String address =
-                    JOptionPane.showInputDialog(
-                            this,
-                            "Enter Address:");
-
-            if (address == null) {
-                return;
-            }
-            
-            
-            //EMPTY FIELD VALIDATION
-            if (name.trim().isEmpty()
-                    || username.trim().isEmpty()
-                    || phoneNumber.trim().isEmpty()
-                    || ageText.trim().isEmpty()
-                    || identityNumber.trim().isEmpty()
-                    || email.trim().isEmpty()
-                    || address.trim().isEmpty()) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "All fields are required.",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE);
-
-                continue;
-            }
-            
-            
-            //PHONE VALIATION
-            if (!phoneNumber.matches(
-                    "^(01)[0-9]{8,9}$")) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Invalid phone number.\n"
-                        + "Example: 0123456789",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE);
-
-                continue;
-            }
-            
-            //IDENTITY NUMBER VALIDATION
-            if (!identityNumber.matches(
-                    "^[0-9]{6}-[0-9]{2}-[0-9]{4}$")) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Invalid identity number.\n"
-                        + "Example: 010101-01-1234",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE);
-
-                continue;
-            }
-            
-            //EMAIL VALIDATION
-            if (!email.matches(
-                    "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Invalid email format.",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE);
-
-                continue;
-            }
-
+            // Age
             int age;
 
-            try {
-
-                age = Integer.parseInt(
-                        ageText.trim());
-
-            } catch (NumberFormatException ex) {
-
-                JOptionPane.showMessageDialog(
+            while (true) {
+                String ageText = JOptionPane.showInputDialog(
                         this,
-                        "Age must be a number.",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Enter Age:"
+                );
 
-                continue;
+                if (ageText == null) {
+                    return;
+                }
+
+                ageText = ageText.trim();
+
+                if (ageText.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Age cannot be empty.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                try {
+                    age = Integer.parseInt(ageText);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Age must be a number.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                if (age < 18 || age > 65) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Age must be between 18 and 65.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                break;
             }
-            
-            
-            //AGE VALIDATION
-            if (age < 18 || age > 65) {
 
-                JOptionPane.showMessageDialog(
+            // Identity Number
+            String identityNumber;
+
+            while (true) {
+                identityNumber = JOptionPane.showInputDialog(
                         this,
-                        "Age must be between 18 and 65.",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Enter Identity Number:"
+                );
 
-                continue;
+                if (identityNumber == null) {
+                    return;
+                }
+
+                identityNumber = identityNumber.trim();
+
+                if (identityNumber.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Identity number cannot be empty.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                if (!identityNumber.matches("^[0-9]{6}-[0-9]{2}-[0-9]{4}$")) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Invalid identity number.\nExample: 010203-14-1234",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                break;
             }
-            
-            //USERNAME VALIDATION
-            if (managerFunction.findUsername(
-                    username.trim()) != null) {
 
-                JOptionPane.showMessageDialog(
+            // Email
+            String email;
+
+            while (true) {
+                email = JOptionPane.showInputDialog(
                         this,
-                        "Username already exists.",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Enter Email:"
+                );
 
-                continue;
+                if (email == null) {
+                    return;
+                }
+
+                email = email.trim();
+
+                if (email.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Email cannot be empty.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Invalid email format.\nExample: example@gmail.com",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                break;
             }
-            
-            
-            //GENERATE USER ID
+
+            // Address
+            String address;
+
+            while (true) {
+                address = JOptionPane.showInputDialog(
+                        this,
+                        "Enter Address:"
+                );
+
+                if (address == null) {
+                    return;
+                }
+
+                address = address.trim();
+
+                if (address.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Address cannot be empty.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    continue;
+                }
+
+                break;
+            }
+
+            // Generate User ID
             String userID = managerFunction.generateUserID(role);
-            
+
+            // Add Staff
             Staff newStaff = managerFunction.addStaff(
-                            role,
-                            userID,
-                            username.trim(),
-                            name.trim(),
-                            phoneNumber.trim(),
-                            age,
-                            identityNumber.trim(),
-                            email.trim(),
-                            address.trim()
+                    role,
+                    userID,
+                    username,
+                    name,
+                    phoneNumber,
+                    age,
+                    identityNumber,
+                    email,
+                    address
             );
-            
-            if (newStaff == null){
+
+            if (newStaff == null) {
                 JOptionPane.showMessageDialog(
                         this,
                         "Failed to add staff.",
                         "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                
-                continue;
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
             }
-            
+
             JOptionPane.showMessageDialog(
                     this,
                     "Staff added successfully!\n\n"
-                    +"User ID: "
-                    + newStaff.getUserID()
-                    + "\nUsername: "
-                    + newStaff.getUsername()
-                    + "\nDefault Password: "
-                    + newStaff.getPassword()
+                    + "User ID: " + userID + "\n"
+                    + "Username: " + username + "\n"
+                    + "Default Password: " + username + userID,
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
             );
-            
-            break;
-            }
-        
         }
         
         
@@ -1213,7 +1296,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
                 
                 dispose();
                 
-                new LoginGUI();
+                new MainGUI();
                         
             }
         }

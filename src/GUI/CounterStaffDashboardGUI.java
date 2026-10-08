@@ -32,7 +32,8 @@ public class CounterStaffDashboardGUI
     JButton payments;
     JButton editProfile;
     JButton logout;
-
+    
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == manageCustomers) {
@@ -78,7 +79,7 @@ public class CounterStaffDashboardGUI
             if(choice == JOptionPane.YES_OPTION){
                 
 
-            LoginGUI loginPage = new LoginGUI();
+            MainGUI loginPage = new MainGUI();
 
             loginPage.setVisible(true);
             x.setVisible(false);

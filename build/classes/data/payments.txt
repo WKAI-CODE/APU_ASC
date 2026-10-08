@@ -1,2 +1,3 @@
 paymentID|appointmentID|amount|paymentMethod|paymentDate|counterStaffID
 P001|A001|80.0|CASH|2026-09-19|CS001
+P002|A004|80.0|CARD|2026-10-08|CS001

@@ -1,2 +1,3 @@
 carID|customerID|registrationNumber|brand|model|year|colour
 CAR001|C001|VAA1234|Perodua|Myvi|2022|Silver
+CAR002|C004|VGQ1081|Perodua|Myvi|2026|Red

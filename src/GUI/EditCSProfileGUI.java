@@ -27,6 +27,7 @@ public class EditCSProfileGUI implements ActionListener {
     JButton editProfile;
     JButton back;
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == viewProfile) {

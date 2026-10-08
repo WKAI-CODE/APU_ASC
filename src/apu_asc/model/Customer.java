@@ -4,10 +4,7 @@
  */
 package apu_asc.model;
 
-/**
- *
- * @author User
- */
+
 public class Customer extends User {
     
     public Customer(

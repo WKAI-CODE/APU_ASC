@@ -37,7 +37,8 @@ public class CarManagementGUI
     JButton updateCar;
     JButton deleteCar;
     JButton back;
-
+    
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == addCar) {
@@ -946,54 +947,49 @@ public class CarManagementGUI
                     ownerName = owner.getName();
                 }
 
-                String confirmation =
-                        JOptionPane.showInputDialog(
+                String carDetails =
+                        "Car ID: " + selectedCar.getCarID()
+                        + "\nCustomer ID: "
+                        + selectedCar.getCustomerID()
+                        + "\nCustomer name: " + ownerName
+                        + "\nRegistration number: "
+                        + selectedCar.getRegistrationNumber()
+                        + "\nBrand: " + selectedCar.getBrand()
+                        + "\nModel: " + selectedCar.getModel()
+                        + "\n\nAre you sure you want to delete this car?";
+
+                int confirmation =
+                        JOptionPane.showConfirmDialog(
                                 x,
-                                "Car ID: "
-                                + selectedCar.getCarID()
-                                + "\nCustomer ID: "
-                                + selectedCar.getCustomerID()
-                                + "\nCustomer name: "
-                                + ownerName
-                                + "\nRegistration number: "
-                                + selectedCar.getRegistrationNumber()
-                                + "\nBrand: "
-                                + selectedCar.getBrand()
-                                + "\nModel: "
-                                + selectedCar.getModel()
-                                + "\n\nType YES to delete this car:"
+                                carDetails,
+                                "Confirm Car Deletion",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE
                         );
 
-                if (confirmation == null
-                        || !confirmation.equalsIgnoreCase("YES")) {
+                if (confirmation != JOptionPane.YES_OPTION) {
+                    return;
+                }
+
+                Car deletedCar =
+                        counterStaff.deleteCar(
+                                selectedCar.getCarID()
+                        );
+
+                if (deletedCar == null) {
 
                     JOptionPane.showMessageDialog(
                             x,
-                            "Deletion cancelled."
+                            "The car could not be deleted.\n"
+                            + "It may have appointment history."
                     );
 
                 } else {
 
-                    Car deletedCar =
-                            counterStaff.deleteCar(
-                                    selectedCar.getCarID()
-                            );
-
-                    if (deletedCar == null) {
-
-                        JOptionPane.showMessageDialog(
-                                x,
-                                "This car cannot be deleted"
-                                + "\nbecause it has appointment history."
-                        );
-
-                    } else {
-
-                        JOptionPane.showMessageDialog(
-                                x,
-                                "Car deleted successfully!"
-                        );
-                    }
+                    JOptionPane.showMessageDialog(
+                            x,
+                            "Car deleted successfully!"
+                    );
                 }
 
             } catch (Exception ex) {
