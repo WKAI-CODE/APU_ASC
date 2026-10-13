@@ -1,0 +1,1 @@
+carID|customerID|registrationNumber|brand|model|year|colour

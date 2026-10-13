@@ -1,0 +1,6 @@
+userID|0|||
+M001|0|||
+CS001|0|||
+M002|0|||
+T002|18|071117-10-2123|as@gmail.com|no1
+T001|67|080922101239|assassin@gmail.com|Jalan Teknologi 5

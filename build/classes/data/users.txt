@@ -1,0 +1,6 @@
+userID|username|password|name|phoneNumber|role
+M001|elvis|elvis123|wongkaicheng|0123456789|Manager
+CS001|mrok|mrokc001|Lim Kai Zhe|0123456789|CounterStaff
+M002|kia|kiaM002|apple|123|Manager
+T002|mr|mrT002|mr|0103658186|Technician
+T001|Skye|a|Skye|0124567893|Technician
