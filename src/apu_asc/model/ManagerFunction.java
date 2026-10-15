@@ -2,7 +2,7 @@ package apu_asc.model;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import apu_asc.utility.DataIO;
+import utility.DataIO;
 
 public class ManagerFunction{
     

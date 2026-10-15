@@ -3,7 +3,7 @@ package GUI;
 import apu_asc.model.Car;
 import apu_asc.model.CounterStaff;
 import apu_asc.model.Customer;
-import apu_asc.utility.DataIO;
+import utility.DataIO;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

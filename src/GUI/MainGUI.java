@@ -1,7 +1,7 @@
 package GUI;
 
 import apu_asc.model.Staff;
-import apu_asc.utility.DataIO;
+import utility.DataIO;
 
 import javax.swing.*;
 import java.awt.*;
@@ -146,6 +146,7 @@ public class MainGUI extends JFrame implements ActionListener{
             }
     
     //BUTTON ACTION
+    @Override
     public void actionPerformed(ActionEvent e){
         
         if (e.getSource() == showPasswordCheckBox) {

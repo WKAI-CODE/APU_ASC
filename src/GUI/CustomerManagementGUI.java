@@ -2,7 +2,7 @@ package GUI;
 
 import apu_asc.model.CounterStaff;
 import apu_asc.model.Customer;
-import apu_asc.utility.DataIO;
+import utility.DataIO;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -108,8 +108,7 @@ public class CustomerManagementGUI
                 } else {
 
                     String userID =
-                            counterStaff
-                                    .generateCustomerID();
+                            counterStaff.generateCustomerID();
 
                     String username = userID;
 
@@ -221,20 +220,10 @@ public class CustomerManagementGUI
                     Customer customer =
                             DataIO.allCustomers.get(i);
 
-                    if (customer.getUserID()
-                                .equalsIgnoreCase(keyword)
-                            || customer.getUsername()
-                                .toLowerCase()
-                                .contains(
-                                        keyword.toLowerCase()
-                                )
-                            || customer.getName()
-                                .toLowerCase()
-                                .contains(
-                                        keyword.toLowerCase()
-                                )
-                            || customer.getPhoneNumber()
-                                .contains(keyword)) {
+                    if (customer.getUserID().equalsIgnoreCase(keyword)
+                            || customer.getUsername().toLowerCase().contains(keyword.toLowerCase())
+                            || customer.getName().toLowerCase().contains(keyword.toLowerCase())
+                            || customer.getPhoneNumber().contains(keyword)) {
 
                         searchResults +=
                                 "Customer ID: "

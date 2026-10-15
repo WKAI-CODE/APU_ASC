@@ -438,7 +438,7 @@ public class DataIO {
 
             PrintWriter writer = new PrintWriter(PAYMENT_FILE);
             
-            writer.println("paymentID|appointmentID|amount|" + "paymentMethod|paymentDate|counterStaffID");
+            writer.println("paymentID|appointmentID|amount|paymentMethod|paymentDate|counterStaffID");
 
             for (int i = 0; i < allPayments.size(); i++) {
 
