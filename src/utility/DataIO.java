@@ -9,6 +9,7 @@ import apu_asc.model.Payment;
 import apu_asc.model.Receipt;
 import apu_asc.model.Staff;
 import apu_asc.model.TechnicianFeedback;
+import apu_asc.model.ServiceRecord;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -25,6 +26,7 @@ public class DataIO {
     private static final String RECEIPT_FILE = "src/data/receipts.txt";
     private static final String TECHNICIAN_FEEDBACK_FILE = "src/data/technician_feedback.txt";
     private static final String CUSTOMER_COMMENT_FILE = "src/data/customer_comments.txt";
+    private static final String SERVICE_RECORD_FILE = "src/data/service_records.txt";
     
     //Array list
     public static ArrayList<Staff> allStaff = new ArrayList<>();
@@ -35,6 +37,7 @@ public class DataIO {
     public static ArrayList<Receipt> allReceipts = new ArrayList<>();
     public static ArrayList<TechnicianFeedback> allTechnicianFeedback = new ArrayList<>();
     public static ArrayList<CustomerComment> allCustomerComments = new ArrayList<>();
+    public static ArrayList<ServiceRecord> allServiceRecords = new ArrayList<>();
     
     
     public static double minorPrice = 0.0;
@@ -52,6 +55,7 @@ public class DataIO {
         writeServicePrices();
         writeTechnicianFeedback();
         writeCustomerComments();
+        writeServiceRecords();
         
     }
     
@@ -65,6 +69,7 @@ public class DataIO {
         allReceipts.clear();
         allTechnicianFeedback.clear();
         allCustomerComments.clear();
+        allServiceRecords.clear();
         
         minorPrice = 0.0;
         majorPrice = 0.0;
@@ -78,6 +83,7 @@ public class DataIO {
         readServicePrices();
         readTechnicianFeedback();
         readCustomerComments();
+        readServiceRecords();
     }
     
     
@@ -746,8 +752,8 @@ public class DataIO {
                         + "|" + comment.getCustomerID()
                         + "|" + comment.getTechnicianRating()
                         + "|" + comment.getCounterStaffRating()
-                        + "|" + comment.getTechnicianComment()
-                        + "|" + comment.getCounterStaffComment()
+                        + "|" + cleanFileText(comment.getTechnicianComment())
+                        + "|" + cleanFileText(comment.getCounterStaffComment())
                         + "|" + comment.getCommentDate()
                 );
             }
@@ -934,6 +940,103 @@ public class DataIO {
         }
         
         return null;
+    }
+
+    private static void writeServiceRecords() {
+        
+        try {
+
+            PrintWriter writer =
+                    new PrintWriter(SERVICE_RECORD_FILE);
+
+            writer.println(
+                    "appointmentID|technicianID|workPerformed|"
+                    + "partsChanged|carModifications"
+            );
+
+            for (int i = 0;
+                    i < allServiceRecords.size();
+                    i++) {
+
+                ServiceRecord record =
+                        allServiceRecords.get(i);
+
+                writer.println(
+                        record.getAppointmentID()
+                        + "|" + record.getTechnicianID()
+                        + "|" + cleanFileText(record.getWorkPerformed())
+                        + "|" + cleanFileText(record.getPartsChanged())
+                        + "|" + cleanFileText(record.getCarModifications())
+                );
+            }
+
+            writer.close();
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "Error in writing service_records.txt"
+            );
+        }
+    }
+
+    private static void readServiceRecords() {
+        
+         try {
+
+            Scanner scanner =
+                    new Scanner(
+                            new File(SERVICE_RECORD_FILE)
+                    );
+
+            while (scanner.hasNextLine()) {
+
+                String line = scanner.nextLine();
+
+                if (line.trim().isEmpty()
+                        || line.startsWith("appointmentID|")) {
+
+                    continue;
+                }
+
+                String[] data =
+                        line.split("\\|", -1);
+
+                if (data.length >= 5) {
+
+                    ServiceRecord record =
+                            new ServiceRecord(
+                                    data[0],
+                                    data[1],
+                                    data[2],
+                                    data[3],
+                                    data[4]
+                            );
+
+                    allServiceRecords.add(record);
+                }
+            }
+
+            scanner.close();
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "Error in reading service_records.txt"
+            );
+        }
+    }
+
+    private static String cleanFileText(String text) {
+
+        if (text == null) {
+            return "";
+        }
+
+        return text
+                .replace("|", "/")
+                .replace("\r", " ")
+                .replace("\n", " ");
     }
 }
 

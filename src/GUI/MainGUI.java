@@ -1,5 +1,6 @@
 package GUI;
 
+import apu_asc.model.Customer;
 import apu_asc.model.Staff;
 import utility.DataIO;
 
@@ -21,7 +22,7 @@ public class MainGUI extends JFrame implements ActionListener{
           
         DataIO.read();
 
-        setTitle("Automative Service Centre");
+        setTitle("Automotive Service Centre");
         setSize(450,500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -37,7 +38,7 @@ public class MainGUI extends JFrame implements ActionListener{
         
         
         //TITLE
-        JLabel titleLabel = new JLabel("AUTOMATIVE SERVICE CENTRE");
+        JLabel titleLabel = new JLabel("AUTOMOTIVE SERVICE CENTRE");
         
         titleLabel.setFont(new Font("Arial", Font.BOLD,20));
         
@@ -171,44 +172,72 @@ public class MainGUI extends JFrame implements ActionListener{
                 
             }
             
-            //FIND STAFF BY USERNAME
+            //FIND STAFF OR CUSTOMER BY USERNAME
             Staff staff = DataIO.checkUsername(username);
-            
+
+            Customer customer =
+                    DataIO.checkCustomerUsername(username);
+
             //USERNAME NOT FOUND
-            if(staff == null){
+            if(staff == null && customer == null){
                 JOptionPane.showMessageDialog(this, "Username not found.");
                 
                 return;
             }
-            
-            //CHECK PASSWORD
-            if(!staff.getPassword().equals(password)){
-                
-                JOptionPane.showMessageDialog(this,"Password is incorrect.");
-                
-                return;
-                
-            }
-            
-            //LOGIN SUCCESS
-            JOptionPane.showMessageDialog(this, "Login successful.");
-            
-            
-            //OPEN GUI BASED ON ROLE
-            if(staff.getRole().equals("Manager")){
-                new ManagerGUI(staff);
-                this.dispose();
-                
-            }else if (staff.getRole().equalsIgnoreCase("CounterStaff")){
-                
-                new CounterStaffDashboardGUI(staff);
-                this.dispose();
-                    
-            } else if (staff.getRole().equals("Technician")) {
 
-                JOptionPane.showMessageDialog(this, "Technician GUI is not ready yet.");
+            if (staff != null) {
+
+                //CHECK STAFF PASSWORD
+                if (!staff.getPassword().equals(password)) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Password is incorrect."
+                    );
+                    return;
+                }
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Login successful."
+                );
+
+                //OPEN STAFF GUI BASED ON ROLE
+                if (staff.getRole().equalsIgnoreCase("Manager")) {
+
+                    new ManagerGUI(staff);
+
+                } else if (staff.getRole()
+                        .equalsIgnoreCase("CounterStaff")) {
+
+                    new CounterStaffDashboardGUI(staff);
+
+                } else if (staff.getRole()
+                        .equalsIgnoreCase("Technician")) {
+
+                    new TechnicianGUI(staff);
+                }
+
+                dispose();
+                return;
             }
-            
+
+            //CHECK CUSTOMER PASSWORD
+            if (!customer.getPassword().equals(password)) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Password is incorrect."
+                );
+                return;
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Login successful."
+            );
+
+            new CustomerGUI(customer);
             dispose();
             
         }
