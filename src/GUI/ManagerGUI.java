@@ -255,7 +255,7 @@ public class ManagerGUI extends JFrame implements ActionListener {
         logoutPanel.add(logoutButton);
 
         JLabel footerLabel = new JLabel(
-                "Automobile Service Centre Management System",
+                "Automotive Service Centre Management System",
                 JLabel.CENTER
         );
 
