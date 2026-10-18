@@ -1,1 +1,15 @@
 userID|age|identityNumber|email|address
+M001|36|900115-14-5678|alicia.manager@apuasc.com|Bukit Jalil, Kuala Lumpur
+M002|42|840622-10-2468|farid.manager@apuasc.com|Shah Alam, Selangor
+M003|39|870310-08-1357|grace.manager@apuasc.com|Petaling Jaya, Selangor
+CS001|34|920722-10-2468|daniel.counter@apuasc.com|Sri Petaling, Kuala Lumpur
+CS002|29|970214-14-3579|priya.counter@apuasc.com|Bangsar, Kuala Lumpur
+CS003|32|940905-10-4680|hafiz.counter@apuasc.com|Ampang, Selangor
+CS004|27|990418-08-5791|joanne.counter@apuasc.com|Setapak, Kuala Lumpur
+T001|31|950310-08-1357|amir.technician@apuasc.com|Cheras, Kuala Lumpur
+T002|30|960825-01-8642|jason.technician@apuasc.com|Puchong, Selangor
+T003|35|910612-10-9753|kumar.technician@apuasc.com|Kajang, Selangor
+T004|28|980127-14-1864|weijian.technician@apuasc.com|Subang Jaya, Selangor
+T005|33|930709-06-2975|syafiq.technician@apuasc.com|Gombak, Selangor
+T006|26|000321-12-3086|rachel.technician@apuasc.com|Kepong, Kuala Lumpur
+

@@ -1,1 +1,22 @@
 feedbackID|appointmentID|technicianID|feedbackText|feedbackDate
+F001|A001|T001|Vehicle is in good condition. Continue regular servicing.|2026-01-12
+F002|A002|T002|Service completed. Monitor the front brake pads.|2026-02-06
+F003|A003|T003|Tyres are still safe but should be checked again soon.|2026-02-20
+F004|A004|T004|Diagnostic scan completed with no serious issue found.|2026-03-10
+F005|A005|T005|Battery condition is good and no replacement is needed.|2026-03-25
+F006|A006|T006|Cooling system is working normally after servicing.|2026-04-08
+F007|A007|T001|Vehicle condition is satisfactory for normal use.|2026-04-22
+F008|A008|T002|Transmission fluid was replaced and performance is normal.|2026-05-11
+F009|A009|T003|Brake condition is good and no repair is required.|2026-05-29
+F010|A010|T004|Wheel alignment should be checked during the next visit.|2026-06-15
+F011|A011|T005|Battery and tyres are in good condition.|2026-06-26
+F012|A012|T006|Cabin filter was replaced and air conditioning is normal.|2026-07-09
+F013|A013|T001|No additional problems were found during inspection.|2026-07-24
+F014|A014|T002|Suspension is stable but rear absorbers should be monitored.|2026-08-05
+F015|A015|T003|Vehicle passed the basic safety inspection.|2026-08-19
+F016|A016|T004|Diagnostic results are normal after the major service.|2026-09-02
+F017|A017|T005|Tyres have sufficient tread for continued use.|2026-09-15
+F018|A018|T006|Battery terminals were cleaned and tested successfully.|2026-09-28
+F019|A019|T001|Routine service completed with no additional issue.|2026-10-01
+F020|A020|T002|Front brake pads were replaced successfully.|2026-10-03
+

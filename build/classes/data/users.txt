@@ -1,1 +1,35 @@
 userID|username|password|name|phoneNumber|role
+M001|manager01|M001@123|Alicia Tan|0123456789|Manager
+M002|manager02|M002@123|Farid Ismail|0132468101|Manager
+M003|manager03|M003@123|Grace Lim|0143579202|Manager
+CS001|counter01|CS001@123|Daniel Lee|0112345678|CounterStaff
+CS002|counter02|CS002@123|Priya Nair|0124681357|CounterStaff
+CS003|counter03|CS003@123|Hafiz Rahman|0135792468|CounterStaff
+CS004|counter04|CS004@123|Joanne Teoh|0146803579|CounterStaff
+T001|technician01|T001@123|Amir Hakim|0134567890|Technician
+T002|technician02|T002@123|Jason Lim|0145678901|Technician
+T003|technician03|T003@123|Kumar Raj|0156789012|Technician
+T004|technician04|T004@123|Wei Jian|0167890123|Technician
+T005|technician05|T005@123|Syafiq Zain|0178901234|Technician
+T006|technician06|T006@123|Rachel Ong|0189012345|Technician
+C001|customer01|C001@123|Nur Aisyah|0162345678|Customer
+C002|customer02|C002@123|Michelle Wong|0173456789|Customer
+C003|customer03|C003@123|Arun Kumar|0184567890|Customer
+C004|customer04|C004@123|Siti Hajar|0195678901|Customer
+C005|customer05|C005@123|Ethan Chong|0121122334|Customer
+C006|customer06|C006@123|Mei Ling|0132233445|Customer
+C007|customer07|C007@123|Muhammad Irfan|0143344556|Customer
+C008|customer08|C008@123|Kavitha Devi|0154455667|Customer
+C009|customer09|C009@123|John Tan|0165566778|Customer
+C010|customer10|C010@123|Aina Sofea|0176677889|Customer
+C011|customer11|C011@123|Brandon Lee|0187788990|Customer
+C012|customer12|C012@123|Nadia Farhana|0198899001|Customer
+C013|customer13|C013@123|Samuel Goh|0129900112|Customer
+C014|customer14|C014@123|Deepa Menon|0131011223|Customer
+C015|customer15|C015@123|Hakim Azlan|0142122334|Customer
+C016|customer16|C016@123|Chloe Yap|0153233445|Customer
+C017|customer17|C017@123|Ravi Chandran|0164344556|Customer
+C018|customer18|C018@123|Farah Izzati|0175455667|Customer
+C019|customer19|C019@123|Nicholas Ho|0186566778|Customer
+C020|customer20|C020@123|Liyana Musa|0197677889|Customer
+

@@ -96,5 +96,14 @@ public class Appointment {
         return paymentStatus;
     }
     
+    public void setAppointmentStatus(String appointmentStatus) {
+        
+        this.appointmentStatus = appointmentStatus;
+    }
+    
+    public void setPaymentStatus(String paymentStatus) {
+        
+        this.paymentStatus = paymentStatus;
+    }
     
 }

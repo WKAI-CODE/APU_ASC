@@ -1,10 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package apu_asc.model;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import utility.DataIO;
 
 public class CounterStaff extends Staff {
     
@@ -19,7 +17,7 @@ public class CounterStaff extends Staff {
             String email,
             String address) {
         
-        super(userID, username, password, name, phoneNumber, "COUNTER_STAFF", age, identityNumber, email, address);
+        super(userID, username, password, name, phoneNumber, "CounterStaff", age, identityNumber, email, address);
     }
     
     public Customer createCustomer(
@@ -67,20 +65,27 @@ public class CounterStaff extends Staff {
             String model,
             int year,
             String colour) {
-        
-        car.setRegistrationNumber(registrationNumber);
-        car.setBrand(brand);
-        car.setModel(model);
-        car.setYear(year);
-        car.setColour(colour);
+
+        if (car != null) {
+
+            car.setRegistrationNumber(
+                    registrationNumber.trim()
+            );
+
+            car.setBrand(brand);
+            car.setModel(model);
+            car.setYear(year);
+            car.setColour(colour);
+
+            DataIO.write();
+        }
     }
     
-    public Appointment bookAppointment(
+    private Appointment bookAppointment(
             String appointmentID,
             String customerID,
             String carID,
             String technicianID,
-            String counterStaffID,
             String serviceType,
             String date,
             String startTime,
@@ -92,7 +97,7 @@ public class CounterStaff extends Staff {
             customerID,
             carID,
             technicianID,
-            counterStaffID,
+            getUserID(),
             serviceType,
             date,
             startTime,
@@ -104,194 +109,846 @@ public class CounterStaff extends Staff {
         return appointment;
     }
     
-    public boolean isValidServiceDuration(
+    public String getServiceDurationError(
             String serviceType,
             String startTime,
             String endTime) {
-        
-        int startHour = Integer.parseInt(startTime.substring(0,2));
-        int startMinute = Integer.parseInt(startTime.substring(3,5));
-        
-        int endHour = Integer.parseInt(endTime.substring(0,2));
-        int endMinute = Integer.parseInt(endTime.substring(3,5));
-        
-        int startTotalMinutes = (startHour * 60) + startMinute;
-        int endTotalMinutes = (endHour * 60) + endMinute;
-        
+
+        if (serviceType == null) {
+            return "Service type cannot be empty.";
+        }
+
+        int startTotalMinutes = convertTimeToMinutes(startTime);
+        int endTotalMinutes = convertTimeToMinutes(endTime);
+
+        if (startTotalMinutes == -1 || endTotalMinutes == -1) {
+            return "Invalid time format. Please use HH:mm.";
+        }
+
         int durationMinutes = endTotalMinutes - startTotalMinutes;
-        
-        if (serviceType.compareTo("MINOR") == 0 && durationMinutes == 60) {
-            
-            return true;
-              
-        } else if (serviceType.compareTo("MAJOR") == 0 && durationMinutes == 180) {
-            
-            return true;
-            
-            
-        } else {
-            return false;
+
+        if (serviceType.equalsIgnoreCase("MINOR")) {
+
+            if (durationMinutes != 60) {return "Minor service must be exactly 1 hour.";
+            }
+
+            return null;
         }
+
+        if (serviceType.equalsIgnoreCase("MAJOR")) {
+
+            if (durationMinutes != 180) {return "Major service must be exactly 3 hours.";
+            }
+
+            return null;
+        }
+
+        return "Service type must be MINOR or MAJOR.";
     }
-    
+
     private int convertTimeToMinutes(String time) {
-        
-        int hour = Integer.parseInt(time.substring(0, 2));
-        int minute = Integer.parseInt(time.substring(3, 5));
-        
-        return (hour * 60) + minute;
-    }
-    
-    public boolean isTechnicianAvailable(
-            Appointment existingAppointment,
-            String technicianID,
-            String date,
-            String startTime,
-            String endTime) {
-        
-        boolean sameTechnician = existingAppointment.getTechnicianID().compareTo(technicianID) == 0;
-        
-        boolean sameDate = existingAppointment.getDate().compareTo(date) == 0;
-        
-        boolean isCancelled = existingAppointment.getAppointmentStatus().compareTo("CANCELLED") == 0;
-        
-        if (sameTechnician && sameDate && !isCancelled){
-            
-            int existingStart = convertTimeToMinutes(existingAppointment.getStartTime());
-        
-            int existingEnd = convertTimeToMinutes(existingAppointment.getEndTime());
-            
-            int newStart = convertTimeToMinutes(startTime);
-            int newEnd = convertTimeToMinutes(endTime);
-            
-            boolean overlaps = newStart < existingEnd && newEnd > existingStart;
-            
-            if (overlaps) {
-                return false;
-            }           
+
+        try {
+            if (time == null || time.length() != 5 || time.charAt(2) != ':'){
+
+                return -1;
+            }
+
+            int hour = Integer.parseInt(time.substring(0, 2));
+            int minute = Integer.parseInt(time.substring(3, 5));
+
+            if (hour < 0 || hour > 23 || minute < 0 || minute > 59){
+
+                return -1;
+            }
+
+            return (hour * 60) + minute;
+
+        } catch (Exception e) {
+
+            return -1;
         }
-        
-        return true;
+        }
+    
+    public String calculateEndTime(
+            String serviceType,
+            String startTime) {
+
+        int startTotalMinutes =
+                convertTimeToMinutes(startTime);
+
+        if (startTotalMinutes == -1) {
+            return null;
+        }
+
+        int durationMinutes;
+
+        if ("MINOR".equalsIgnoreCase(
+                serviceType)) {
+
+            durationMinutes = 60;
+
+        } else if ("MAJOR".equalsIgnoreCase(
+                serviceType)) {
+
+            durationMinutes = 180;
+
+        } else {
+
+            return null;
+        }
+
+        int endTotalMinutes =
+                startTotalMinutes
+                + durationMinutes;
+
+        if (endTotalMinutes >= 1440) {
+            return null;
+        }
+
+        int endHour =
+                endTotalMinutes / 60;
+
+        int endMinute =
+                endTotalMinutes % 60;
+
+        return String.format(
+                "%02d:%02d",
+                endHour,
+                endMinute
+        );
     }
     
-    public boolean isTechnicianAvailableForAll(
-            Appointment[] appointments,
+    public Appointment findConflictingAppointment(
             String technicianID,
             String date,
             String startTime,
             String endTime) {
         
-        for (int i = 0; i < appointments.length; i++) {
+        int newStart = convertTimeToMinutes(startTime);
+        int newEnd = convertTimeToMinutes(endTime);
+        
+        for (int i = 0; i < DataIO.allAppointments.size(); i++) {
             
-            if (appointments[i] != null) {
+            Appointment appointment = DataIO.allAppointments.get(i);
+            
+            if (appointment.getTechnicianID().equalsIgnoreCase(technicianID) && appointment.getDate().equals(date) && !"CANCELLED".equalsIgnoreCase(appointment.getAppointmentStatus())) {
                 
-                boolean available = 
-                        isTechnicianAvailable(
-                                appointments[i],
-                                technicianID,
-                                date,
-                                startTime,
-                                endTime);
+                int existingStart = convertTimeToMinutes(appointment.getStartTime());
                 
-                if (!available) {
-                    return false;
+                int existingEnd = convertTimeToMinutes(appointment.getEndTime());
+                
+                if (newStart < existingEnd && newEnd > existingStart) {
+                    return appointment;
                 }
-                
             }
         }
-        
-        return true;
+        return null;
     }
     
+    public String generateAppointmentID() {
+
+        int number =
+                DataIO.allAppointments.size() + 1;
+
+        String appointmentID =
+                String.format(
+                        "A%03d",
+                        number
+                );
+
+        while (DataIO.checkAppointmentID(
+                appointmentID) != null) {
+
+            number++;
+
+            appointmentID =
+                    String.format(
+                            "A%03d",
+                            number
+                    );
+        }
+
+        return appointmentID;
+    }
+
     public Appointment bookAppointmentWithValidation(
-            Appointment[] appointments,
             String appointmentID,
             String customerID,
             String carID,
             String technicianID,
-            String counterStaffID,
             String serviceType,
             String date,
             String startTime,
-            String endTime,
-            double servicePrice) {
+            String endTime) {
         
-        boolean validDuration = isValidServiceDuration(
-                serviceType,
-                startTime,
-                endTime);
+        GregorianCalendar validBookingDate = getValidBookingDate(date);
         
-        if (!validDuration) {
+        if (validBookingDate == null) {
+            System.out.println("Failed: Booking date must be from tomorrow until the next 14 days.");
             return null;
         }
         
-        boolean technicianAvailable = isTechnicianAvailableForAll(
-                appointments,
-                technicianID,
-                date,
-                startTime,
-                endTime);
+        String workingHoursError = getWorkingHoursError(startTime, endTime);
         
-        if (!technicianAvailable) {
+        if (workingHoursError != null) {
+            System.out.println("Failed: " + workingHoursError);
             return null;
         }
         
-        return bookAppointment(
-                appointmentID,
-                customerID,
+        String serviceDurationError = getServiceDurationError(
+                        serviceType,
+                        startTime,
+                        endTime);
+
+        if (serviceDurationError != null) {
+            System.out.println("Failed: " + serviceDurationError);
+            return null;
+        }
+        
+        double servicePrice;
+        
+        if ("MINOR".equalsIgnoreCase(serviceType)) {
+            
+            servicePrice = DataIO.minorPrice;
+            
+        } else if ("MAJOR".equalsIgnoreCase(serviceType)) {
+            
+            servicePrice = DataIO.majorPrice;
+            
+        } else {
+            
+            System.out.println("Failed: Invalid service type.");
+            return null;
+        }
+        
+        if (servicePrice <= 0) {
+            
+            System.out.println("Failed: Service price has not been set.");
+            return null;
+        }
+        
+        Customer customer = DataIO.checkCustomerID(customerID);
+        
+        if (customer == null) {
+            System.out.println("Failed: Customer does not exist.");
+            return null;
+        }
+        
+        Staff technician = DataIO.checkUserID(technicianID);
+        
+        if (technician == null) {
+            System.out.print("Failed: Technician does not exist.");
+            return null;
+        }
+        
+        if (!"TECHNICIAN".equalsIgnoreCase(technician.getRole())) {
+            
+            System.out.println("Failed: Selected staff is not a Technician.");
+            return null;
+        }
+        
+        Car car = DataIO.checkCarID(carID);
+        
+        if (car == null) {
+            System.out.println("Failed: Car does not exist.");
+            return null;
+        }
+        
+        if (!car.getCustomerID().equalsIgnoreCase(customerID)) {
+            System.out.println("Failed: Car does not belong to the Customer.");
+            return null;
+        }
+        
+        Appointment existingAppointment = DataIO.checkAppointmentID(appointmentID);
+        
+        if (existingAppointment != null) {
+            System.out.println("Failed: Appointment ID already exists.");
+            return null;
+        }
+
+        Appointment conflictingAppointment = findConflictingAppointment(
+                        technicianID,
+                        date,
+                        startTime,
+                        endTime);
+        
+        if (conflictingAppointment != null) {
+            System.out.println("Failed: Technician already has another appointment.");
+            return null;
+        }
+        
+        Appointment newAppointment =
+                bookAppointment(
+                        appointmentID,
+                        customerID,
+                        carID,
+                        technicianID,
+                        serviceType,
+                        date,
+                        startTime,
+                        endTime,
+                        servicePrice);
+        
+        DataIO.allAppointments.add(newAppointment);
+        DataIO.write();
+        
+        return newAppointment;
+    }
+    
+    public GregorianCalendar getValidBookingDate(String date) {
+        
+        try {
+            if (date == null || date.length() != 10 || date.charAt(4) != '-' || date.charAt(7) != '-') {
+                return null;
+            }
+            
+            int year = Integer.parseInt(date.substring(0, 4));
+            int month = Integer.parseInt(date.substring(5, 7)) - 1;
+            int day = Integer.parseInt(date.substring(8, 10));
+            
+            GregorianCalendar bookingDate = new GregorianCalendar(year, month, day);
+            
+            if (bookingDate.get(Calendar.YEAR) != year || bookingDate.get(Calendar.MONTH) != month || bookingDate.get(Calendar.DATE) != day) {
+                return null;
+            }
+            
+            GregorianCalendar currentDate = new GregorianCalendar();
+            
+            GregorianCalendar tomorrow = new GregorianCalendar(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE));
+            
+            tomorrow.add(Calendar.DATE, 1);
+            
+            GregorianCalendar lastBookingDate = new GregorianCalendar(
+                        currentDate.get(Calendar.YEAR),
+                       currentDate.get(Calendar.MONTH),
+                   currentDate.get(Calendar.DATE));
+            
+            lastBookingDate.add(Calendar.DATE, 14);
+            
+            if (tomorrow.after(bookingDate) || bookingDate.after(lastBookingDate)) {
+                return null;
+            }
+            
+            return bookingDate;
+            
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    
+    
+    public String getWorkingHoursError(
+            String startTime,
+            String endTime) {
+        
+        int openingTime = convertTimeToMinutes("09:00");
+        int closingTime = convertTimeToMinutes("18:00");
+        
+        int appointmentStart = convertTimeToMinutes(startTime);
+        int appointmentEnd = convertTimeToMinutes(endTime);
+        
+        if (appointmentStart == -1  || appointmentEnd == -1) {
+            return "Invalid time format. Please use HH:mm";
+        }
+        
+        if (appointmentStart >= appointmentEnd) {
+            return "The end time must be later than the start time.";
+        }
+        
+        if (appointmentStart < openingTime || appointmentEnd > closingTime) {
+            return "Appointment must be between 09:00 and 18:00";
+        }
+        
+        return null;
+    }
+    
+    public String generatePaymentID() {
+
+        int number =
+                DataIO.allPayments.size() + 1;
+
+        String paymentID =
+                String.format(
+                        "P%03d",
+                        number
+                );
+
+        while (DataIO.checkPaymentID(
+                paymentID) != null) {
+
+            number++;
+
+            paymentID =
+                    String.format(
+                            "P%03d",
+                            number
+                    );
+        }
+
+        return paymentID;
+    }
+
+
+    public String generateReceiptID() {
+
+        int number =
+                DataIO.allReceipts.size() + 1;
+
+        String receiptID =
+                String.format(
+                        "R%03d",
+                        number
+                );
+
+        while (DataIO.checkReceiptID(
+                receiptID) != null) {
+
+            number++;
+
+            receiptID =
+                    String.format(
+                            "R%03d",
+                            number
+                    );
+        }
+
+        return receiptID;
+    }
+
+    public String getCurrentDate() {
+
+        GregorianCalendar currentDate =
+                new GregorianCalendar();
+
+        int year =
+                currentDate.get(
+                        Calendar.YEAR
+                );
+
+        int month =
+                currentDate.get(
+                        Calendar.MONTH
+                ) + 1;
+
+        int day =
+                currentDate.get(
+                        Calendar.DATE
+                );
+
+        return String.format(
+                "%04d-%02d-%02d",
+                year,
+                month,
+                day
+        );
+    }
+    
+    public Payment collectPayment(
+            String appointmentID,
+            String paymentID,
+            String paymentMethod,
+            String paymentDate) {
+
+        Appointment appointment = DataIO.checkAppointmentID(appointmentID);
+
+        if (appointment == null) {
+            System.out.println("Failed: Appointment does not exist.");
+            return null;
+        }
+
+        if (!"COMPLETED".equalsIgnoreCase(appointment.getAppointmentStatus())) {
+
+            System.out.println("Failed: Payment can only be collected after the appointment is completed.");
+            return null;
+        }
+
+        if (!"UNPAID".equalsIgnoreCase(appointment.getPaymentStatus())) {
+
+            System.out.println("Failed: This appointment has already been paid.");
+            return null;
+        }
+
+        Payment existingPayment = DataIO.checkPaymentID(paymentID);
+
+        if (existingPayment != null) {
+            System.out.println("Failed: Payment ID already exists.");
+            return null;
+        }
+
+        Payment newPayment =
+                new Payment(
+                        paymentID,
+                        appointment.getAppointmentID(),
+                        appointment.getServicePrice(),
+                        paymentMethod,
+                        paymentDate,
+                        getUserID());
+
+        appointment.setPaymentStatus("PAID");
+
+        DataIO.allPayments.add(newPayment);
+        DataIO.write();
+
+        return newPayment;
+    }
+        
+        public Receipt findReceiptByPaymentID(String paymentID) {
+
+        for (int i = 0; i < DataIO.allReceipts.size(); i++) {
+
+            Receipt receipt = DataIO.allReceipts.get(i);
+
+            if (receipt.getPaymentID().equalsIgnoreCase(paymentID)) {
+                return receipt;
+            }
+        }
+
+        return null;
+    }
+    
+    public Receipt generateReceipt(
+            String paymentID,
+            String receiptID,
+            String customerID,
+            String receiptDate) {
+
+        Payment payment =
+                DataIO.checkPaymentID(paymentID);
+
+        if (payment == null) {
+            System.out.println("Failed: Payment does not exist.");
+            return null;
+        }
+
+        Appointment appointment =
+                DataIO.checkAppointmentID(
+                        payment.getAppointmentID());
+
+        if (appointment == null) {
+            System.out.println("Failed: Appointment does not exist.");
+            return null;
+        }
+
+        if (!"PAID".equalsIgnoreCase(
+                appointment.getPaymentStatus())) {
+
+            System.out.println("Failed: Receipt can only be generated after payment.");
+            return null;
+        }
+
+        if (!appointment.getCustomerID()
+                .equalsIgnoreCase(customerID)) {
+
+            System.out.println("Failed: The appointment does not belong to this customer.");
+            return null;
+        }
+
+        Receipt existingReceipt =
+                DataIO.checkReceiptID(receiptID);
+
+        if (existingReceipt != null) {
+            System.out.println("Failed: Receipt ID already exists.");
+            return null;
+        }
+        
+        Receipt receiptForPayment =
+                findReceiptByPaymentID(paymentID);
+
+        if (receiptForPayment != null) {
+            System.out.println("Failed: A receipt has already been generated for this payment.");
+            return null;
+        }
+
+        Receipt newReceipt =
+                new Receipt(
+                        receiptID,
+                        paymentID,
+                        appointment.getAppointmentID(),
+                        customerID,
+                        payment.getAmount(),
+                        receiptDate);
+
+        DataIO.allReceipts.add(newReceipt);
+        DataIO.write();
+
+        return newReceipt;
+    }
+    
+    public Customer updateCustomerDetails(
+            Customer customer,
+            String username,
+            String password,
+            String name,
+            String phoneNumber) {
+
+        if (customer == null) {
+            System.out.println("Failed: Customer does not exist.");
+            return null;
+        }
+
+        Customer customerWithSameUsername =
+                DataIO.checkCustomerUsername(username);
+
+        Staff staffWithSameUsername =
+                DataIO.checkUsername(username);
+
+        if (customerWithSameUsername != null
+                && !customerWithSameUsername.getUserID()
+                        .equalsIgnoreCase(customer.getUserID())) {
+
+            System.out.println("Failed: Username is already used by another customer.");
+            return null;
+        }
+
+        if (staffWithSameUsername != null) {
+            System.out.println("Failed: Username is already used by a staff member.");
+            return null;
+        }
+
+        customer.setUsername(username); 
+        customer.setPassword(password);
+        customer.setName(name);
+        customer.setPhoneNumber(phoneNumber);
+
+        DataIO.write();
+
+        return customer;
+    }
+    
+    public Customer deleteCustomer(String customerID){
+            
+        Customer customer = DataIO.checkCustomerID(customerID);
+        
+        if (customer == null) {
+            return null;
+        }
+        
+        for (int i = 0; i < DataIO.allCars.size(); i++) {
+            
+            Car car = DataIO.allCars.get(i);
+            
+            if (car.getCustomerID().equalsIgnoreCase(customerID)) {
+                
+                System.out.println("Customer cannot be deleted because they still own a car.");
+                
+                return null;
+            }
+        }
+        
+        DataIO.allCustomers.remove(customer);
+        
+        DataIO.write();
+        
+        return customer;
+    }
+    
+    public Car deleteCar(String carID){
+        
+        Car car = DataIO.checkCarID(carID);
+        
+        if (car == null) {
+            return null;
+        }
+        
+        for (int i = 0; i < DataIO.allAppointments.size(); i++) {
+            
+            Appointment appointment = DataIO.allAppointments.get(i);
+            
+            if (appointment.getCarID().equalsIgnoreCase(carID)) {
+                
+                System.out.println("Car cannot be deleted because it has appointment history.");
+                
+                return null;
+            }
+        }
+        
+        DataIO.allCars.remove(car);
+        
+        DataIO.write();
+        
+        return car;
+    }
+    
+    public Staff editProfile(
+            String username,
+            String password,
+            String name,
+            String phoneNumber,
+            int age,
+            String identityNumber,
+            String email,
+            String address) {
+
+        Staff savedCounterStaff =
+                DataIO.checkUserID(getUserID());
+
+        if (savedCounterStaff == null) {
+            System.out.println(
+                    "Failed: Counter Staff account does not exist.");
+            return null;
+        }
+
+        Staff staffWithSameUsername =
+                DataIO.checkUsername(username);
+
+        Customer customerWithSameUsername =
+                DataIO.checkCustomerUsername(username);
+
+        if (staffWithSameUsername != null
+                && !staffWithSameUsername.getUserID()
+                        .equalsIgnoreCase(getUserID())) {
+
+            System.out.println(
+                    "Failed: Username is already used by another staff member.");
+            return null;
+        }
+
+        if (customerWithSameUsername != null) {
+            System.out.println(
+                    "Failed: Username is already used by a customer.");
+            return null;
+        }
+
+        // Update the object stored inside DataIO
+        savedCounterStaff.setUsername(username);
+        savedCounterStaff.setPassword(password);
+        savedCounterStaff.setName(name);
+        savedCounterStaff.setPhoneNumber(phoneNumber);
+        savedCounterStaff.setAge(age);
+        savedCounterStaff.setIdentityNumber(identityNumber);
+        savedCounterStaff.setEmail(email);
+        savedCounterStaff.setAddress(address);
+
+        // Update the currently logged-in object
+        setUsername(username);
+        setPassword(password);
+        setName(name);
+        setPhoneNumber(phoneNumber);
+        setAge(age);
+        setIdentityNumber(identityNumber);
+        setEmail(email);
+        setAddress(address);
+
+        DataIO.write();
+
+        return savedCounterStaff;
+    }
+    
+    public String generateCustomerID() {
+        
+        int number = DataIO.allCustomers.size() + 1;
+        
+        String customerID = String.format("C%03d", number);
+        
+        while (DataIO.checkCustomerID(customerID) != null 
+                || DataIO.checkUserID(customerID) != null 
+                || DataIO.checkCustomerUsername(customerID) != null
+                || DataIO.checkUsername(customerID) != null) {
+            
+            number ++;
+            
+            customerID = String.format("C%03d", number);
+        }
+        
+        return customerID;
+    }
+    
+    public Customer addCustomer(
+            String userID,
+            String username,
+            String password,
+            String name,
+            String phoneNumber) {
+        
+        Customer customerWithSameID = DataIO.checkCustomerID(userID);
+        
+        Staff staffWithSameID = DataIO.checkUserID(userID);
+        
+        Customer customerWithSameUsername = DataIO.checkCustomerUsername(username);
+        
+        Staff staffWithSameUsername = DataIO.checkUsername(username);
+        
+        if (customerWithSameID != null || staffWithSameID != null || customerWithSameUsername != null || staffWithSameUsername != null) {
+            
+            return null;
+        }       
+        
+        Customer newCustomer = createCustomer(
+                userID,
+                username,
+                password,
+                name,
+                phoneNumber);
+
+        DataIO.allCustomers.add(newCustomer);
+        
+        DataIO.write();
+        
+        return newCustomer;
+    }
+    
+    public String generateCarID() {
+
+        int number = DataIO.allCars.size() + 1;
+
+        String carID = String.format("CAR%03d",number);
+
+        while (DataIO.checkCarID(carID) != null) {
+
+            number++;
+
+            carID = String.format("CAR%03d",number);
+        }
+
+        return carID;
+    }
+    
+    public Car addCar(
+            String carID,
+            String customerID,
+            String registrationNumber,
+            String brand,
+            String model,
+            int year,
+            String colour) {
+
+        Customer owner = DataIO.checkCustomerID(customerID);
+
+        if (owner == null) {
+            return null;
+        }
+
+        Car existingCar = DataIO.checkCarID(carID);
+
+        if (existingCar != null) {
+            return null;
+        }
+
+        registrationNumber = registrationNumber.trim();
+
+        for (Car car : DataIO.allCars) {
+
+            if (car.getRegistrationNumber()
+                    .equalsIgnoreCase(registrationNumber)) {
+
+                return null;
+            }
+        }
+
+        Car newCar = registerCar(
                 carID,
-                technicianID,
-                counterStaffID,
-                serviceType,
-                date,
-                startTime,
-                endTime,
-                servicePrice);
+                customerID,
+                registrationNumber,
+                brand,
+                model,
+                year,
+                colour);
+
+        DataIO.allCars.add(newCar);
+        
+        DataIO.write();
+
+        return newCar;
     }
-    
-    public boolean isValidBookingDate(String date) {
-        int year = Integer.parseInt(date.substring(0,4));
-        int month = Integer.parseInt(date.substring(5,7)) -1;
-        int day = Integer.parseInt(date.substring(8, 10));
-        
-        GregorianCalendar bookingDate = new GregorianCalendar(year, month, day);
-        
-        boolean correctDate = bookingDate.get(Calendar.YEAR) == year && bookingDate.get(Calendar.MONTH) == month && bookingDate.get(Calendar.DATE) == day;
-        
-        if (!correctDate) {
-            return false;
-        }
-        
-        GregorianCalendar currentDate = new GregorianCalendar();
-        
-        int currentYear = currentDate.get(Calendar.YEAR);
-        int currentMonth = currentDate.get(Calendar.MONTH);
-        int currentDay = currentDate.get(Calendar.DATE);
-        
-        GregorianCalendar tomorrow = new GregorianCalendar(
-                    currentYear,
-                    currentMonth,
-                    currentDay);
-        
-        tomorrow.add(Calendar.DATE, 1);
-        
-        GregorianCalendar lastBookingDate = new GregorianCalendar(
-                    currentYear,
-                    currentMonth,
-                    currentDay);
-        
-        lastBookingDate.add(Calendar.DATE, 14);
-        
-        boolean beforeTomorrow = tomorrow.after(bookingDate);
-        
-        boolean afterLastBookingDate = bookingDate.after(lastBookingDate);
-        
-        if (beforeTomorrow || afterLastBookingDate) {
-            return false;
-        }
-        
-        return true;
-        
-    }
-    
 }
