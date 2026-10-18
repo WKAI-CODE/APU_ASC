@@ -1,1 +1,26 @@
 appointmentID|technicianID|workPerformed|partsChanged|carModifications
+A001|T001|Completed engine inspection and minor service.|Engine oil and oil filter.|None
+A002|T002|Completed full service and safety inspection.|Engine oil, oil filter and air filter.|None
+A003|T003|Checked brakes, tyres and fluid levels.|Engine oil.|None
+A004|T004|Completed major service and diagnostic scan.|Engine oil, oil filter and spark plugs.|None
+A005|T005|Performed minor service and battery test.|Engine oil and oil filter.|None
+A006|T006|Completed major service and cooling system check.|Coolant, engine oil and oil filter.|None
+A007|T001|Inspected lights, brakes and tyre pressure.|Engine oil.|None
+A008|T002|Completed full service and transmission inspection.|Engine oil, oil filter and transmission fluid.|None
+A009|T003|Performed routine service and brake inspection.|Engine oil and oil filter.|None
+A010|T004|Completed major service and wheel alignment check.|Engine oil, filters and spark plugs.|None
+A011|T005|Checked battery, tyres and engine condition.|Engine oil.|None
+A012|T006|Completed major service and air conditioning inspection.|Engine oil, oil filter and cabin filter.|None
+A013|T001|Performed minor service and safety inspection.|Engine oil and oil filter.|None
+A014|T002|Completed full service and suspension inspection.|Engine oil, filters and brake fluid.|None
+A015|T003|Checked engine, brakes and fluid levels.|Engine oil.|None
+A016|T004|Completed major service and diagnostic testing.|Engine oil, oil filter and air filter.|None
+A017|T005|Performed minor service and tyre inspection.|Engine oil and oil filter.|None
+A018|T006|Completed full service and battery inspection.|Engine oil, filters and battery terminal.|None
+A019|T001|Performed minor service and engine health check.|Engine oil and oil filter.|None
+A020|T002|Completed major service and brake system check.|Engine oil, filters and front brake pads.|None
+A021|T003|Performed routine service and battery test.|Engine oil.|None
+A022|T004|Completed major service and cooling system inspection.|Engine oil, oil filter and coolant.|None
+A023|T005|Performed minor service and tyre pressure check.|Engine oil and oil filter.|None
+A024|T006|Completed full service and safety inspection.|Engine oil, filters and spark plugs.|None
+

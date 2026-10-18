@@ -22,8 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 
-public class CarManagementGUI
-        implements ActionListener {
+public class CarManagementGUI implements ActionListener {
 
     CounterStaff counterStaff;
 
@@ -792,6 +791,27 @@ public class CarManagementGUI
                     );
 
                     return;
+                }
+
+                for (Car car : DataIO.allCars) {
+
+                    if (!car.getCarID()
+                                .equalsIgnoreCase(
+                                        selectedCar.getCarID()
+                                )
+                            && car.getRegistrationNumber()
+                                .equalsIgnoreCase(
+                                        registrationNumber
+                                )) {
+
+                        JOptionPane.showMessageDialog(
+                                x,
+                                "The registration number is already "
+                                + "used by another car!"
+                        );
+
+                        return;
+                    }
                 }
 
                 counterStaff.updateCarDetails(

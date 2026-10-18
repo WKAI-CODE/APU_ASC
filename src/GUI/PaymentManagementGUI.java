@@ -116,10 +116,9 @@ public class PaymentManagementGUI
                     return;
                 }
 
-                JOptionPane.showMessageDialog(
-                        x,
-                        "Appointments Ready for Payment:\n\n"
-                        + eligibleAppointments
+                showScrollableResults(
+                        "Appointments Ready for Payment",
+                        eligibleAppointments
                 );
 
                 String appointmentID =

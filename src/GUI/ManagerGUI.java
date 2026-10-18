@@ -2,6 +2,7 @@ package GUI;
 
 import apu_asc.model.ManagerFunction;
 import apu_asc.model.Staff;
+import utility.DataIO;
 
 import javax.swing.*;
 import java.awt.*;
@@ -415,7 +416,8 @@ public class ManagerGUI extends JFrame implements ActionListener {
                     continue;
                 }
 
-                if (managerFunction.findUsername(username) != null) {
+                if (managerFunction.findUsername(username) != null
+                        || DataIO.checkCustomerUsername(username) != null) {
                     JOptionPane.showMessageDialog(
                             this,
                             "Username already exists. Please enter another username.",
@@ -814,27 +816,38 @@ public class ManagerGUI extends JFrame implements ActionListener {
                 return;
             }
             
-            //USERNAME CHECK
-            if(field.equals("Username")){
-                Staff existing = managerFunction.findUsername(
+            // USERNAME CHECK
+            if (field.equals("Username")) {
+
+                Staff existingStaff = managerFunction.findUsername(
                         newValue.trim()
                 );
-                
-            if(existing!= null 
-                    && !existing.getUserID()
-                            .equalsIgnoreCase(
-                                    staff.getUserID())){
-                
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Username already exists.",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                
-                return;
-                               
-            }
+
+                if (existingStaff != null
+                        && !existingStaff.getUserID()
+                                .equalsIgnoreCase(staff.getUserID())) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Username is already used by another staff.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                    return;
+                }
+
+                if (DataIO.checkCustomerUsername(newValue.trim()) != null) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Username is already used by a customer.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                    return;
+                }
             }
             
             //PHONE CHECK

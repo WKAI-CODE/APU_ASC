@@ -29,7 +29,7 @@ public class ManagerFunction{
         }
 
         // CHECK DUPLICATE USERNAME
-        if (findUsername(username) != null) {
+        if (findUsername(username) != null || DataIO.checkCustomerUsername(username) != null) {
             return null;
         }
         
@@ -165,7 +165,23 @@ public class ManagerFunction{
             return null;
         }
         
-        if(field.equals("Username")){
+        if (field.equals("Username")) {
+
+            newValue = newValue.trim();
+
+            Staff existingStaff = findUsername(newValue);
+
+            if (existingStaff != null
+                    && !existingStaff.getUserID()
+                            .equalsIgnoreCase(userID)) {
+
+                return null;
+            }
+
+            if (DataIO.checkCustomerUsername(newValue) != null) {
+                return null;
+            }
+            
             staff.setUsername(newValue);
             
         }else if (field.equals("Name")){
@@ -229,8 +245,8 @@ public class ManagerFunction{
     
     //SET SERVICE PRICE
     public String setServicePrice(double minorPrice, double majorPrice){
-        if(minorPrice < 0 || majorPrice < 0){
-            return "Invalid Price. ";
+        if(minorPrice <= 0 || majorPrice <= 0){
+            return "Invalid Price. Service prices must be greater than zero.";
         }
         
         DataIO.minorPrice = minorPrice;
@@ -440,7 +456,7 @@ public class ManagerFunction{
         return 
                 "===== REVENUE REPORT =====\n\n"
 
-                + "Total Revenue       : RM "
+                + "Total Service Value : RM "
                 + df.format(totalRevenue) + "\n\n"
 
                 + "Paid Revenue        : RM "

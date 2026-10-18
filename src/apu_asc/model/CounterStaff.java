@@ -2,8 +2,7 @@ package apu_asc.model;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import 
-        utility.DataIO;
+import utility.DataIO;
 
 public class CounterStaff extends Staff {
     
@@ -66,14 +65,18 @@ public class CounterStaff extends Staff {
             String model,
             int year,
             String colour) {
-        
+
         if (car != null) {
-            car.setRegistrationNumber(registrationNumber);
+
+            car.setRegistrationNumber(
+                    registrationNumber.trim()
+            );
+
             car.setBrand(brand);
             car.setModel(model);
             car.setYear(year);
             car.setColour(colour);
-            
+
             DataIO.write();
         }
     }
@@ -576,7 +579,7 @@ public class CounterStaff extends Staff {
         Payment newPayment =
                 new Payment(
                         paymentID,
-                        appointmentID,
+                        appointment.getAppointmentID(),
                         appointment.getServicePrice(),
                         paymentMethod,
                         paymentDate,
@@ -909,17 +912,28 @@ public class CounterStaff extends Staff {
             String model,
             int year,
             String colour) {
-        
+
         Customer owner = DataIO.checkCustomerID(customerID);
-        
+
         if (owner == null) {
             return null;
         }
-        
+
         Car existingCar = DataIO.checkCarID(carID);
-        
+
         if (existingCar != null) {
             return null;
+        }
+
+        registrationNumber = registrationNumber.trim();
+
+        for (Car car : DataIO.allCars) {
+
+            if (car.getRegistrationNumber()
+                    .equalsIgnoreCase(registrationNumber)) {
+
+                return null;
+            }
         }
 
         Car newCar = registerCar(

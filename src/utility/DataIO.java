@@ -5,9 +5,11 @@ import apu_asc.model.Appointment;
 import apu_asc.model.Car;
 import apu_asc.model.Customer;
 import apu_asc.model.CustomerComment;
+import apu_asc.model.Manager;
 import apu_asc.model.Payment;
 import apu_asc.model.Receipt;
 import apu_asc.model.Staff;
+import apu_asc.model.Technician;
 import apu_asc.model.TechnicianFeedback;
 import apu_asc.model.ServiceRecord;
 
@@ -165,6 +167,22 @@ public class DataIO {
                         
                         allCustomers.add(customer);
                         
+                    } else if (role.equalsIgnoreCase("Manager")) {
+
+                        Manager manager = new Manager(
+                                userID,
+                                username,
+                                password,
+                                name,
+                                phoneNumber,
+                                0,
+                                "",
+                                "",
+                                ""
+                        );
+
+                        allStaff.add(manager);
+
                     } else if (role.equalsIgnoreCase("CounterStaff")) {
                         
                         CounterStaff counterStaff = new CounterStaff(
@@ -180,6 +198,22 @@ public class DataIO {
                         );
                         
                         allStaff.add(counterStaff);
+
+                    } else if (role.equalsIgnoreCase("Technician")) {
+
+                        Technician technician = new Technician(
+                                userID,
+                                username,
+                                password,
+                                name,
+                                phoneNumber,
+                                0,
+                                "",
+                                "",
+                                ""
+                        );
+
+                        allStaff.add(technician);
                         
                     } else {
                     

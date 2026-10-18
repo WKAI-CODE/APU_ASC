@@ -1,1 +1,16 @@
 commentID|appointmentID|customerID|technicianRating|counterStaffRating|technicianComment|counterStaffComment|commentDate
+CC001|A001|C001|5|5|The technician explained the service clearly.|The counter staff was friendly and helpful.|2026-01-13
+CC002|A002|C002|4|5|The major service was completed carefully.|The payment process was quick and easy.|2026-02-07
+CC003|A003|C003|5|4|The technician checked the vehicle properly.|The counter staff provided clear information.|2026-02-21
+CC004|A004|C004|4|4|The technician completed the work professionally.|The booking process was smooth.|2026-03-11
+CC005|A005|C005|5|5|The technician was helpful and polite.|The counter staff gave good assistance.|2026-03-26
+CC006|A006|C006|4|5|The service quality was good.|The counter staff explained the payment clearly.|2026-04-09
+CC007|A007|C007|5|4|The technician finished the service on time.|The counter service was satisfactory.|2026-04-23
+CC008|A008|C008|4|5|The technician gave useful advice.|The staff handled the appointment well.|2026-05-12
+CC009|A009|C009|5|5|The service was completed neatly.|The counter staff was efficient.|2026-05-30
+CC010|A010|C010|4|4|The technician explained the inspection result.|The payment process was convenient.|2026-06-16
+CC011|A011|C011|5|5|The technician was professional.|The counter staff was friendly.|2026-06-27
+CC012|A012|C012|4|5|The major service was completed properly.|The appointment arrangement was clear.|2026-07-10
+CC013|A013|C013|5|4|The technician checked everything carefully.|The counter service was good.|2026-07-25
+CC014|A014|C014|4|5|The technician gave clear maintenance advice.|The staff made payment easy.|2026-08-06
+CC015|A015|C015|5|5|The service was fast and professional.|The counter staff was very helpful.|2026-08-20
